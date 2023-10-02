@@ -4,17 +4,31 @@ import {
 } from "@/components/transformable-image";
 
 import type { KonvaEventObject } from "konva/lib/Node";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FormEventHandler, useState } from "react";
 import { Layer, Stage } from "react-konva";
 
 import { v1 } from "uuid";
 import TransformableText, {
   TransformableTextProps,
 } from "./transformable-text";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { appSlice } from "@/store/app.slice";
+
+// Provider * 
 
 const Canvas = () => {
+
+  const dispatch = useAppDispatch()
+
+  const selectedItemId = useAppSelector((state) => state.app.selectedItemId)
+  
+  const selectItem = (id: string) => dispatch(appSlice.actions.selectItem(id))
+
   const [selectedImageId, selectImage] = useState<string | null>(null);
   const [selectedTextId, selectText] = useState<string | null>(null);
+  const [inputText, setInputText] = useState("");
 
   const [images, setImages] = useState<TransformableImageProps["imageProps"][]>(
     [],
@@ -22,47 +36,25 @@ const Canvas = () => {
 
   const [texts, setTexts] = useState<TransformableTextProps["textProps"][]>([]);
 
-  const checkDeselect = (e: KonvaEventObject<MouseEvent>) => {
-    // deselect when clicked on empty area
-    const clickedOnEmpty = e.target === e.target.getStage();
-    if (clickedOnEmpty) {
-      selectImage(null);
-    }
+
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputText(e.target.value);
   };
 
-  const handleImageUploaded = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  
 
-    const imageId = v1();
-    const imageUrl = URL.createObjectURL(file);
-    setImages((prev) => [...prev, { imageUrl, imageId }]);
-  };
-
-  const handleTextAdd = (e: ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value;
-    const textId = v1();
-
-    setTexts((prev) => [...prev, { text, textId }]);
-  };
-
-  /*console.log(texts, " ++++ ", images);*/
 
   return (
-    <main>
-      <input type="file" onChange={handleImageUploaded} />
-      <input
-        type="text"
-        onChange={handleTextAdd}
-        placeholder="tape your text"
-      />
+    <main className="flex">
+     
       <Stage width={window.innerWidth} height={window.innerHeight}>
         <Layer>
           {images.map((image) => {
             return (
               <TransformableImage
-                onSelect={() => selectImage(image.imageId)}
-                isSelected={image.imageId === selectedImageId}
+                onSelect={() => selectItem(image.imageId)}
+                isSelected={image.imageId === selectedItemId}
                 onChange={(newAttrs) => {
                   setImages(
                     images.map((i) =>
@@ -78,8 +70,8 @@ const Canvas = () => {
           {texts.map((text) => {
             return (
               <TransformableText
-                onSelect={() => selectText(text.textId)}
-                isSelected={text.textId === selectedTextId}
+                onSelect={() => selectItem(text.textId)}
+                isSelected={text.textId === selectedItemId}
                 onChange={(newAttrs) => {
                   setTexts(
                     texts.map((t) => (t.textId === text.textId ? newAttrs : t)),
