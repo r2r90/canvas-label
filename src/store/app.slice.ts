@@ -1,9 +1,12 @@
-import { TransformableImageProps } from "@/components/transformable-image";
-import { TransformableTextProps } from "@/components/transformable-text";
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { KonvaEventObject } from "konva/lib/Node";
-import { ChangeEvent } from "react";
+import type { TransformableImageProps } from "@/components/transformable-image";
+import type { TransformableTextProps } from "@/components/transformable-text";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import type { KonvaEventObject } from "konva/lib/Node";
+import type { ChangeEvent } from "react";
+
+import { createSlice } from "@reduxjs/toolkit";
 import { v1 } from "uuid";
+import { TextConfig } from "konva/lib/shapes/Text";
 
 const initialState = {
   selectedItemId: null as string | null,
@@ -25,6 +28,7 @@ export const appSlice = createSlice({
     },
     addText: (state, action: PayloadAction<{ initialValue: string }>) => {
       const textId = v1();
+
       state.texts.push({ text: action.payload.initialValue, id: textId });
     },
 
@@ -43,5 +47,20 @@ export const appSlice = createSlice({
         state.selectedItemId = null;
       }
     },
+
+    updateText: (
+      state,
+      action: PayloadAction<Omit<TextConfig, "id"> & { id: string }>,
+    ) => {
+      const textToUpdate = state.texts.findIndex(
+        (t) => t.id === action.payload.id,
+      );
+      state.texts[textToUpdate] = action.payload;
+    },
   },
 });
+
+export const { addImage, addText, selectItem, checkDeselect, updateText } =
+  appSlice.actions;
+
+

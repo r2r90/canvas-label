@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Sidebar } from "./sidebar";
+import { Navbar } from "./navbar";
 
 type Props = {
   children: ReactNode;
@@ -7,9 +8,12 @@ type Props = {
 
 export const Layout = ({ children }: Props) => {
   return (
-    <div className="flex h-full ">
-      <Sidebar {} />
-      <main>{children}</main>
-    </div>
+    <>
+      <Navbar />
+      <div className="flex h-full ">
+        <Sidebar />
+        <main className="h-full w-full bg-slate-300">{children}</main>
+      </div>
+    </>
   );
 };

@@ -1,0 +1,2 @@
+[ ] image toolbar
+[ ] text toolbar

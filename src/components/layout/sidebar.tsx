@@ -1,21 +1,30 @@
+import { addImage, addText } from "@/store/app.slice";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { useAppDispatch } from "@/hooks";
+import { ChangeEvent, useState } from "react";
 
-type Props = {
-  handleImageUploaded: any;
-  handleInputChange: any;
-  inputText: any;
-  handleTextAdd: any;
-};
 
-export function Sidebar({
-  handleImageUploaded,
-  handleInputChange,
-  handleTextAdd,
-  inputText,
-}: Props) {
+export function Sidebar() {
+  const dispatch = useAppDispatch();
+
+  const [inputText, setInputText] = useState("");
+
+  const handleImageUploaded = (e: ChangeEvent<HTMLInputElement>) => {
+    dispatch(addImage(e));
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputText(e.target.value);
+  };
+
+  console.log(inputText);
+  
+
+  const handleTextAdd = () => dispatch(addText({initialValue: inputText}));
+
   return (
-    <div className="flex flex-col ">
+    <div className="h-full flex flex-col ">
       <Input
         type="file"
         className="m-[2rem] w-auto "

@@ -14,77 +14,63 @@ import TransformableText, {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { appSlice } from "@/store/app.slice";
+import { appSlice, checkDeselect } from "@/store/app.slice";
+import { Toolbar } from "./toolbar";
 
-// Provider * 
+// Provider *
 
 const Canvas = () => {
+  const dispatch = useAppDispatch();
 
-  const dispatch = useAppDispatch()
+  const selectedItemId = useAppSelector((state) => state.app.selectedItemId);
+  const selectItem = (id: string) => dispatch(appSlice.actions.selectItem(id));
+  const texts = useAppSelector((state) => state.app.texts);
+  const images = useAppSelector((state) => state.app.images);
 
-  const selectedItemId = useAppSelector((state) => state.app.selectedItemId)
-  
-  const selectItem = (id: string) => dispatch(appSlice.actions.selectItem(id))
-
-  const [selectedImageId, selectImage] = useState<string | null>(null);
-  const [selectedTextId, selectText] = useState<string | null>(null);
-  const [inputText, setInputText] = useState("");
-
-  const [images, setImages] = useState<TransformableImageProps["imageProps"][]>(
-    [],
-  );
-
-  const [texts, setTexts] = useState<TransformableTextProps["textProps"][]>([]);
-
-
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputText(e.target.value);
+  const deselectHandler = (e) => {
+    dispatch(checkDeselect(e));
   };
 
-  
-
-
   return (
-    <main className="flex">
-     
-      <Stage width={window.innerWidth} height={window.innerHeight}>
+    <div className="flex h-screen w-full flex-col items-center justify-between">
+      <Toolbar />
+      <Stage
+        className="bg-white"
+        width={600}
+        height={500}
+        onTouchStart={deselectHandler}
+        onMouseDown={deselectHandler}
+      >
         <Layer>
           {images.map((image) => {
             return (
               <TransformableImage
-                onSelect={() => selectItem(image.imageId)}
-                isSelected={image.imageId === selectedItemId}
+                onSelect={() => selectItem(image.id)}
+                isSelected={image.id === selectedItemId}
                 onChange={(newAttrs) => {
-                  setImages(
-                    images.map((i) =>
-                      i.imageId === image.imageId ? newAttrs : i,
-                    ),
-                  );
+                  images.map((i) => (i.id === image.id ? newAttrs : i));
                 }}
                 imageProps={image}
-                key={image.imageId}
+                key={image.id}
               />
             );
           })}
           {texts.map((text) => {
             return (
               <TransformableText
-                onSelect={() => selectItem(text.textId)}
-                isSelected={text.textId === selectedItemId}
+                onSelect={() => selectItem(text.id)}
+                isSelected={text.id === selectedItemId}
                 onChange={(newAttrs) => {
-                  setTexts(
-                    texts.map((t) => (t.textId === text.textId ? newAttrs : t)),
-                  );
+                  texts.map((t) => (t.id === text.id ? newAttrs : t));
                 }}
                 textProps={text}
-                key={text.textId}
+                key={text.id}
               />
             );
           })}
         </Layer>
       </Stage>
-    </main>
+    </div>
   );
 };
 
