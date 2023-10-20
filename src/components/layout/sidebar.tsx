@@ -18,7 +18,6 @@ export function Sidebar() {
     setInputText(e.target.value);
   };
 
-  console.log(inputText);
   
 
   const handleTextAdd = () => dispatch(addText({initialValue: inputText}));

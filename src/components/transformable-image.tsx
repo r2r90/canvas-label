@@ -26,7 +26,6 @@ export const TransformableImage = ({
   const trRef = useRef<ElementRef<typeof Transformer>>(null);
   const [image] = useImage(imageProps.imageUrl);
 
-  console.log(imageProps, isSelected, onSelect, onChange, "    IMAGE ");
 
   useEffect(() => {
     if (!imageRef.current) return;
@@ -56,7 +55,7 @@ export const TransformableImage = ({
             y: e.target.y(),
           });
         }}
-        /* onTransformEnd={(e) => {
+        onTransformEnd={(e) => {
           const node = imageRef.current;
           if (!node) return;
 
@@ -75,7 +74,7 @@ export const TransformableImage = ({
             width: Math.max(5, node.width() * scaleX),
             height: Math.max(node.height() * scaleY),
           });
-        }}*/
+        }}
       />
       {isSelected && (
         <Transformer

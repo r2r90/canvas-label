@@ -14,6 +14,11 @@ const initialState = {
   texts: [] as TransformableTextProps["textProps"][],
 };
 
+const defaultTextConfig = {
+  fontSize: 16,
+  align: "center",
+};
+
 export const appSlice = createSlice({
   name: "app",
   initialState,
@@ -21,31 +26,27 @@ export const appSlice = createSlice({
     addImage: (state, action: PayloadAction<ChangeEvent<HTMLInputElement>>) => {
       const file = action.payload.target.files?.[0];
       if (!file) return;
-
       const imageId = v1();
       const imageUrl = URL.createObjectURL(file);
       state.images.push({ imageUrl, id: imageId });
     },
+
     addText: (state, action: PayloadAction<{ initialValue: string }>) => {
       const textId = v1();
 
-      state.texts.push({ text: action.payload.initialValue, id: textId });
+      state.texts.push({
+        text: action.payload.initialValue,
+        id: textId,
+        ...defaultTextConfig,
+      });
     },
 
     selectItem: (state, action: PayloadAction<string>) => {
       state.selectedItemId = action.payload;
     },
 
-    checkDeselect: (
-      state,
-      action: PayloadAction<KonvaEventObject<MouseEvent>>,
-    ) => {
-      // deselect when clicked on empty area
-      const clickedOnEmpty =
-        action.payload.target === action.payload.target.getStage();
-      if (clickedOnEmpty) {
-        state.selectedItemId = null;
-      }
+    deselectItem: (state) => {
+      state.selectedItemId = null;
     },
 
     updateText: (
@@ -57,10 +58,33 @@ export const appSlice = createSlice({
       );
       state.texts[textToUpdate] = action.payload;
     },
+    updateTextFontSize: (
+      state,
+      action: PayloadAction<Omit<TextConfig, "id"> & { id: string }>,
+    ) => {
+      const textToUpdate = state.texts.findIndex(
+        (t) => t.id === action.payload.id,
+      );
+      state.texts[textToUpdate] = action.payload;
+    },
+
+    // updateTextFontFamily: (
+    //   state,
+    //   action: PayloadAction<Omit<TextConfig, "id"> & { id: string }>,
+    // ) => {
+    //   const textToUpdate = state.texts.findIndex(
+    //     (t) => t.id === action.payload.id,
+    //   );
+    //   state.texts[textToUpdate] = action.payload;
+    // },
   },
 });
 
-export const { addImage, addText, selectItem, checkDeselect, updateText } =
-  appSlice.actions;
-
-
+export const {
+  addImage,
+  addText,
+  selectItem,
+  deselectItem,
+  updateText,
+  updateTextFontSize,
+} = appSlice.actions;

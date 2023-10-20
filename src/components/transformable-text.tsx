@@ -1,10 +1,23 @@
+import type { TextConfig } from "konva/lib/shapes/Text";
 import { useRef, type ElementRef, useEffect } from "react";
-import { type TextConfig } from "konva/lib/shapes/Text";
 import { Text, Transformer } from "react-konva";
 
 type TransformableTextConfig = Omit<TextConfig, "text"> & {
   text?: TextConfig["text"];
   id: string;
+  direction?: string;
+  fontFamily?: string;
+  fontSize?: number;
+  fontStyle?: string;
+  fontVariant?: string;
+  textDecoration?: string;
+  align?: string;
+  verticalAlign?: string;
+  padding?: number;
+  lineHeight?: number;
+  letterSpacing?: number;
+  wrap?: string;
+  ellipsis?: boolean;
 };
 
 export type TransformableTextProps = {
@@ -38,8 +51,20 @@ const TransformableText = ({
     <>
       <Text
         onClick={onSelect}
+        onTransform={() => {
+          if (textRef.current !== null) {
+            const textNode = textRef.current;
+            const newWidth = textNode.width() * textNode.scaleX();
+            textNode.setAttrs({
+              width: newWidth,
+              scaleX: 1,
+              scaleY: 1,
+            });
+          }
+        }}
         onTap={onSelect}
         ref={textRef}
+        align={"center"}
         {...textProps}
         text={text}
         draggable
@@ -51,7 +76,7 @@ const TransformableText = ({
             y: e.target.y(),
           });
         }}
-        /* onTransformEnd={(e) => {
+        onTransformEnd={(e) => {
           const node = textRef.current;
           if (!node) return;
 
@@ -59,8 +84,8 @@ const TransformableText = ({
           const scaleY = node.scaleY();
 
           // we will reset it back
-          node.scaleX(1);
-          node.scaleY(1);
+          // node.scaleX(1);
+          // node.scaleY(1);
           onChange({
             ...textProps,
             text,
@@ -70,17 +95,13 @@ const TransformableText = ({
             width: Math.max(5, node.width() * scaleX),
             height: Math.max(node.height() * scaleY),
           });
-        }}*/
+        }}
       />
       {isSelected && (
         <Transformer
           ref={trRef}
           boundBoxFunc={(oldBox, newBox) => {
-            // limit resize
-            if (newBox.width < 5 || newBox.height < 5) {
-              return oldBox;
-            }
-            return newBox;
+            return { ...newBox, height: oldBox.height };
           }}
         />
       )}

@@ -1,5 +1,9 @@
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { updateText } from "@/store/app.slice";
+import { Toggle } from "@/components/ui/toggle";
+import { Select } from "@/components/ui/select";
+import { FontFamilyPicker } from "./font-family-picker";
+import { FontSizeSelector } from "./font-size-selector";
 
 export const Toolbar = () => {
   const dispatch = useAppDispatch();
@@ -8,33 +12,76 @@ export const Toolbar = () => {
 
   const currentText = texts.find((t) => t.id === selectedItemId);
 
-  console.log(currentText);
-
   if (!currentText) return null;
 
   const handleFontStyleToggle = (button: "bold" | "italic") => () => {
     dispatch(
       updateText({
         ...currentText,
-        fontStyle: getFontStyle(
-          currentText.fontStyle as string | undefined,
-          button,
-        ),
+        fontStyle: getFontStyle(currentText.fontStyle, button),
+      }),
+    );
+  };
+
+  const handleTextDecorationToggle =
+    (button: "underline" | "line-through") => () => {
+      dispatch(
+        updateText({
+          ...currentText,
+          textDecoration: getFontStyle(currentText.textDecoration, button),
+        }),
+      );
+    };
+
+  const handleTextFontSizeChange = (e: number | undefined) => {
+    dispatch(
+      updateText({
+        ...currentText,
+        fontSize: e,
       }),
     );
   };
 
   return (
-    <div className="flex gap-6">
-      <button onClick={handleFontStyleToggle("italic")}>Italic</button>
-      <button onClick={handleFontStyleToggle("bold")}>Bold</button>
+    <div className="flex h-[5rem] w-full gap-6 border bg-white p-[1rem] transition">
+      <Toggle
+        className="data-[state=on]:font-bold"
+        onClick={handleFontStyleToggle("bold")}
+      >
+        B
+      </Toggle>
+      <Toggle
+        className="data-[state=on]:italic"
+        onClick={handleFontStyleToggle("italic")}
+      >
+        I
+      </Toggle>
+      <Toggle
+        className="underline data-[state=on]:no-underline"
+        onClick={handleTextDecorationToggle("underline")}
+      >
+        U
+      </Toggle>
+      <Toggle
+        className="line-through data-[state=on]:no-underline"
+        onClick={handleTextDecorationToggle("line-through")}
+      >
+        S
+      </Toggle>
+
+      <FontSizeSelector
+        value={currentText.fontSize ?? 16}
+        fontSizeHandler={handleTextFontSizeChange}
+      />
+      <input type="color" />
+      <FontFamilyPicker />
     </div>
   );
 };
 
 const getFontStyle = (
   currentStyle: string | undefined,
-  buttonClicked: "bold" | "italic",
+  buttonClicked: "bold" | "italic" | "underline" | "line-through",
 ) => {
   if (buttonClicked === "bold") {
     if (currentStyle?.includes("bold")) {
@@ -47,5 +94,17 @@ const getFontStyle = (
       return currentStyle?.replace("italic", "").trim();
     }
     return ((currentStyle ?? "") + " italic").trim();
+  }
+  if (buttonClicked === "underline") {
+    if (currentStyle?.includes("underline")) {
+      return currentStyle?.replace("underline", "").trim();
+    }
+    return ((currentStyle ?? "") + " underline").trim();
+  }
+  if (buttonClicked === "line-through") {
+    if (currentStyle?.includes("line-through")) {
+      return currentStyle?.replace("line-through", "").trim();
+    }
+    return ((currentStyle ?? "") + " line-through").trim();
   }
 };
