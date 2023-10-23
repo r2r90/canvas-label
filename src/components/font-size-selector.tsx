@@ -22,7 +22,7 @@ export function FontSizeSelector({ value, fontSizeHandler }: FontSizeSelector) {
             <Slider
               id="fontSize"
               min={1}
-              max={48}
+              max={100}
               defaultValue={[value ?? 16]}
               step={1}
               onValueChange={(e) => {
@@ -33,13 +33,6 @@ export function FontSizeSelector({ value, fontSizeHandler }: FontSizeSelector) {
             />
           </div>
         </HoverCardTrigger>
-        {/* <HoverCardContent
-          align="start"
-          className="w-[260px] text-sm"
-          side="left"
-        >
-         Select font
-        </HoverCardContent> */}
       </HoverCard>
     </>
   );

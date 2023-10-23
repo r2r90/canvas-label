@@ -1,12 +1,12 @@
 import type { TransformableImageProps } from "@/components/transformable-image";
 import type { TransformableTextProps } from "@/components/transformable-text";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { KonvaEventObject } from "konva/lib/Node";
 import type { ChangeEvent } from "react";
 
 import { createSlice } from "@reduxjs/toolkit";
 import { v1 } from "uuid";
-import { TextConfig } from "konva/lib/shapes/Text";
+import type { TextConfig } from "konva/lib/shapes/Text";
+import { RootState } from "./store";
 
 const initialState = {
   selectedItemId: null as string | null,
@@ -14,9 +14,12 @@ const initialState = {
   texts: [] as TransformableTextProps["textProps"][],
 };
 
+type InitialState = typeof initialState;
+
 const defaultTextConfig = {
   fontSize: 16,
   align: "center",
+  fontFamily: "Roboto",
 };
 
 export const appSlice = createSlice({
@@ -51,40 +54,22 @@ export const appSlice = createSlice({
 
     updateText: (
       state,
-      action: PayloadAction<Omit<TextConfig, "id"> & { id: string }>,
+      action: PayloadAction<{ id: string } & Partial<TextConfig>>,
     ) => {
-      const textToUpdate = state.texts.findIndex(
+      const textToUpdateIndex = state.texts.findIndex(
         (t) => t.id === action.payload.id,
       );
-      state.texts[textToUpdate] = action.payload;
-    },
-    updateTextFontSize: (
-      state,
-      action: PayloadAction<Omit<TextConfig, "id"> & { id: string }>,
-    ) => {
-      const textToUpdate = state.texts.findIndex(
-        (t) => t.id === action.payload.id,
-      );
-      state.texts[textToUpdate] = action.payload;
-    },
+      const textToUpdate = state.texts[textToUpdateIndex];
 
-    // updateTextFontFamily: (
-    //   state,
-    //   action: PayloadAction<Omit<TextConfig, "id"> & { id: string }>,
-    // ) => {
-    //   const textToUpdate = state.texts.findIndex(
-    //     (t) => t.id === action.payload.id,
-    //   );
-    //   state.texts[textToUpdate] = action.payload;
-    // },
+      if (!textToUpdate) return;
+
+      state.texts[textToUpdateIndex] = {
+        ...textToUpdate,
+        ...action.payload,
+      };
+    },
   },
 });
 
-export const {
-  addImage,
-  addText,
-  selectItem,
-  deselectItem,
-  updateText,
-  updateTextFontSize,
-} = appSlice.actions;
+export const { addImage, addText, selectItem, deselectItem, updateText } =
+  appSlice.actions;

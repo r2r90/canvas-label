@@ -6,7 +6,7 @@ type TransformableTextConfig = Omit<TextConfig, "text"> & {
   text?: TextConfig["text"];
   id: string;
   direction?: string;
-  fontFamily?: string;
+  fontFamily: string;
   fontSize?: number;
   fontStyle?: string;
   fontVariant?: string;

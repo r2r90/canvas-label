@@ -1,11 +1,13 @@
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { updateText } from "@/store/app.slice";
 import { Toggle } from "@/components/ui/toggle";
-import { Select } from "@/components/ui/select";
 import { FontFamilyPicker } from "./font-family-picker";
 import { FontSizeSelector } from "./font-size-selector";
+import { useState, type ChangeEvent } from "react";
+import { SpacingSettings } from "./spacing-settings";
 
 export const Toolbar = () => {
+  const [alignment, setAlignment] = useState("left");
   const dispatch = useAppDispatch();
   const selectedItemId = useAppSelector((state) => state.app.selectedItemId);
   const texts = useAppSelector((state) => state.app.texts);
@@ -15,9 +17,10 @@ export const Toolbar = () => {
   if (!currentText) return null;
 
   const handleFontStyleToggle = (button: "bold" | "italic") => () => {
+    if (!selectedItemId) return;
     dispatch(
       updateText({
-        ...currentText,
+        id: selectedItemId,
         fontStyle: getFontStyle(currentText.fontStyle, button),
       }),
     );
@@ -25,22 +28,56 @@ export const Toolbar = () => {
 
   const handleTextDecorationToggle =
     (button: "underline" | "line-through") => () => {
+      if (!selectedItemId) return;
+
       dispatch(
         updateText({
-          ...currentText,
+          id: selectedItemId,
           textDecoration: getFontStyle(currentText.textDecoration, button),
         }),
       );
     };
 
   const handleTextFontSizeChange = (e: number | undefined) => {
+    if (!selectedItemId) return;
     dispatch(
       updateText({
-        ...currentText,
+        id: selectedItemId,
         fontSize: e,
       }),
     );
   };
+
+  const handleTextFontFamilyChange = (e: string | undefined) => {
+    if (!selectedItemId) return;
+    dispatch(
+      updateText({
+        id: selectedItemId,
+        fontFamily: e,
+      }),
+    );
+  };
+  const handleTextColorChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!selectedItemId) return;
+    dispatch(
+      updateText({
+        id: selectedItemId,
+        fill: e.target.value,
+      }),
+    );
+  };
+
+  const handleTextAlignChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!selectedItemId) return;
+    dispatch(
+      updateText({
+        id: selectedItemId,
+        align: e.target.value,
+      }),
+    );
+  };
+
+  const handleAlignmentChange = (newAlignment: string | undefined) => {};
 
   return (
     <div className="flex h-[5rem] w-full gap-6 border bg-white p-[1rem] transition">
@@ -73,8 +110,22 @@ export const Toolbar = () => {
         value={currentText.fontSize ?? 16}
         fontSizeHandler={handleTextFontSizeChange}
       />
-      <input type="color" />
-      <FontFamilyPicker />
+      <input
+        type="color"
+        onChange={handleTextColorChange}
+        value={currentText.fill}
+      />
+      <FontFamilyPicker
+        handleTextFontFamilyChange={handleTextFontFamilyChange}
+        selectedFont={currentText.fontFamily}
+      />
+
+      <Toggle
+        className="data-[state=on]:font-bold"
+        onClick={handleAlignmentChange("left")}
+      ></Toggle>
+
+      <SpacingSettings />
     </div>
   );
 };

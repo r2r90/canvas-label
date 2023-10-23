@@ -2,10 +2,7 @@
 
 import * as React from "react";
 import fonts from "../assets/fonts.json";
-import {
-  CaretSortIcon,
-  CheckIcon,
-} from "@radix-ui/react-icons";
+import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@/lib/utils";
 
@@ -26,15 +23,14 @@ import {
 
 import { useEffect } from "react";
 
-type PopoverTriggerProps = React.ComponentPropsWithoutRef<
-  typeof PopoverTrigger
->;
+type Props = {
+  handleTextFontFamilyChange: (fontFamiy: string | undefined) => void;
+  selectedFont: string;
+};
 
-type Props = PopoverTriggerProps;
-
-export function FontFamilyPicker({}: Props) {
+export function FontFamilyPicker({ handleTextFontFamilyChange, selectedFont }: Props) {
   const [open, setOpen] = React.useState(false);
-  const [selectedFont, setSelectedFont] = React.useState<string>("Roboto");
+ 
 
   useEffect(() => {
     fonts.items.map((font): void => {
@@ -73,8 +69,8 @@ export function FontFamilyPicker({}: Props) {
               <CommandItem
                 key={font.family}
                 onSelect={() => {
-                  setSelectedFont(font.family);
                   setOpen(false);
+                  handleTextFontFamilyChange(font.family);
                 }}
                 className="text-sm"
                 style={{ fontFamily: font.family }}
