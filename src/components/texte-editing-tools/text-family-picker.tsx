@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import fonts from "../assets/fonts.json";
+import fonts from "../../assets/fonts.json";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@/lib/utils";
@@ -21,16 +21,29 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { updateText } from "@/store/app.slice";
+import { useAppDispatch } from "@/hooks";
+import type { TextConfig } from "konva/lib/shapes/Text";
 
 type Props = {
-  handleTextFontFamilyChange: (fontFamiy: string | undefined) => void;
-  selectedFont: string;
+  currentText: TextConfig;
+  selectedItemId: string | null;
 };
 
-export function FontFamilyPicker({ handleTextFontFamilyChange, selectedFont }: Props) {
-  const [open, setOpen] = React.useState(false);
- 
+export function FontFamilyPicker({ currentText, selectedItemId }: Props) {
+  const dispatch = useAppDispatch();
+  const [open, setOpen] = useState(false);
+
+  const handleTextFontFamilyChange = (e: string | undefined) => {
+    if (!selectedItemId) return;
+    dispatch(
+      updateText({
+        id: selectedItemId,
+        fontFamily: e,
+      }),
+    );
+  };
 
   useEffect(() => {
     fonts.items.map((font): void => {
@@ -44,6 +57,8 @@ export function FontFamilyPicker({ handleTextFontFamilyChange, selectedFont }: P
         .catch((e) => console.error(e));
     });
   }, []);
+
+  const selectedFont = currentText.fontFamily ?? "Roboto";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
