@@ -1,6 +1,7 @@
 import type { TextConfig } from "konva/lib/shapes/Text";
 import { useRef, type ElementRef, useEffect } from "react";
 import { Text, Transformer } from "react-konva";
+import * as console from "console";
 
 type TransformableTextConfig = Omit<TextConfig, "text"> & {
   text?: TextConfig["text"];

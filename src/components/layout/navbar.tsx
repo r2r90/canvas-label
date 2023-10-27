@@ -1,6 +1,6 @@
 import { UserNav } from "./user-nav";
 import Image from "next/image";
-import logo from "@/assets/logo.png"
+import logo from "@/assets/logo.png";
 
 export const Navbar = () => {
   return (

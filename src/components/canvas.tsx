@@ -6,7 +6,11 @@ import { Layer, Stage } from "react-konva";
 import TransformableText from "./transformable-text";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { appSlice, deselectItem } from "@/store/app.slice";
-import { Toolbar } from "./toolbar";
+import { TextToolbar } from "./text-toolbar";
+import { useEffect, useState } from "react";
+import { EditableText } from "@/components/editable-resizable-text";
+import { ImageToolbar } from "@/components/image-toolbar";
+import { Toolbar } from "@/components/toolbar";
 
 const Canvas = () => {
   const dispatch = useAppDispatch();
@@ -26,9 +30,35 @@ const Canvas = () => {
     dispatch(deselectItem());
   };
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [isTransforming, setIsTransforming] = useState(false);
+  const [text, setText] = useState("Click to resize. Double click to edit.");
+  const [width, setWidth] = useState(200);
+  const [height, setHeight] = useState(200);
+  const [selected, setSelected] = useState(false);
+
+  useEffect(() => {
+    if (!selected && isEditing) {
+      setIsEditing(false);
+    } else if (!selected && isTransforming) {
+      setIsTransforming(false);
+    }
+  }, [selected, isEditing, isTransforming]);
+
+  function toggleEdit() {
+    setIsEditing(!isEditing);
+    setSelected(!isEditing);
+  }
+
+  function toggleTransforming() {
+    setIsTransforming(!isTransforming);
+    setSelected(!isTransforming);
+  }
+
   return (
     <div className="flex h-screen w-full flex-col items-center">
       <Toolbar />
+
       <Stage
         className="m-[3rem] bg-white"
         width={600}
@@ -63,6 +93,23 @@ const Canvas = () => {
               />
             );
           })}
+
+          {/*<EditableText*/}
+          {/*  x={20}*/}
+          {/*  y={40}*/}
+          {/*  text={text}*/}
+          {/*  width={width}*/}
+          {/*  height={height}*/}
+          {/*  onResize={(newWidth, newHeight) => {*/}
+          {/*    setWidth(newWidth);*/}
+          {/*    setHeight(newHeight);*/}
+          {/*  }}*/}
+          {/*  isEditing={isEditing}*/}
+          {/*  isTransforming={isTransforming}*/}
+          {/*  onToggleEdit={toggleEdit}*/}
+          {/*  onToggleTransform={toggleTransforming}*/}
+          {/*  onChange={setText}*/}
+          {/*/>*/}
         </Layer>
       </Stage>
     </div>

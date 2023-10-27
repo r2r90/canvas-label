@@ -36,7 +36,7 @@ export const appSlice = createSlice({
 
     addText: (state, action: PayloadAction<{ initialValue: string }>) => {
       const textId = v1();
-
+      console.log(state);
       state.texts.push({
         text: action.payload.initialValue,
         id: textId,
@@ -68,8 +68,22 @@ export const appSlice = createSlice({
         ...action.payload,
       };
     },
+
+    deleteShape: (state, action: PayloadAction<string>) => {
+      console.log(state.texts);
+      return {
+        ...state,
+        texts: state.texts.filter((shape) => shape.id !== action.payload),
+      };
+    },
   },
 });
 
-export const { addImage, addText, selectItem, deselectItem, updateText } =
-  appSlice.actions;
+export const {
+  addImage,
+  addText,
+  selectItem,
+  deselectItem,
+  updateText,
+  deleteShape,
+} = appSlice.actions;

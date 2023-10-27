@@ -31,7 +31,6 @@ export function FontStyle({ currentText, selectedItemId }: Props) {
   const handleTextDecorationToggle =
     (button: "underline" | "line-through") => () => {
       if (!selectedItemId) return;
-
       dispatch(
         updateText({
           id: selectedItemId,
@@ -47,8 +46,7 @@ export function FontStyle({ currentText, selectedItemId }: Props) {
           onClick={handleFontStyleToggle("bold")}
           value={currentText.fontStyle}
         >
-          <FontBoldIcon className="mr-2 h-4 w-4" />
-          Bold
+          <FontBoldIcon className="h-4 w-4" />
         </Toggle>
 
         <Toggle
@@ -56,30 +54,22 @@ export function FontStyle({ currentText, selectedItemId }: Props) {
           onClick={handleFontStyleToggle("italic")}
           value={currentText.fontStyle}
         >
-          <FontItalicIcon className="mr-2 h-4 w-4" />
-          Italic
+          <FontItalicIcon className="h-4 w-4" />
         </Toggle>
-
-        <Separator
-          orientation="vertical"
-          className="mx-2 my-auto h-[2rem] items-center "
-        />
 
         <Toggle
           aria-label="Toggle italic"
           onClick={handleTextDecorationToggle("underline")}
           value={currentText.textDecoration}
         >
-          <UnderlineIcon className="mr-2 h-4 w-4" />
-          Souligné
+          <UnderlineIcon className="h-4 w-4" />
         </Toggle>
         <Toggle
           aria-label="Toggle italic"
           onClick={handleTextDecorationToggle("line-through")}
           value={currentText.textDecoration}
         >
-          <StrikethroughIcon className="mr-2 h-4 w-4" />
-          Barré
+          <StrikethroughIcon className="h-4 w-4" />
         </Toggle>
       </div>
     </>
