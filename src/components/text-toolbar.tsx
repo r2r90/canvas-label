@@ -9,6 +9,7 @@ import { type TransformableTextProps } from "@/components/transformable-text";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch } from "@/hooks";
 import { deleteShape } from "@/store/app.slice";
+import { DeleteShapeButton } from "@/components/delete-shape-button";
 
 type Props = {
   selectedItemId: string;
@@ -22,9 +23,6 @@ export const TextToolbar = ({
 }: Props) => {
   const dispatch = useAppDispatch();
   if (!currentText) return null;
-  const deleteTextHandler = (selectedItemId) => {
-    dispatch(deleteShape(selectedItemId));
-  };
 
   return (
     <>
@@ -53,9 +51,6 @@ export const TextToolbar = ({
         currentText={currentText}
         selectedItemId={selectedItemId}
       />
-      <Button onClick={() => deleteTextHandler(selectedItemId)}>
-        Delete Text
-      </Button>
     </>
   );
 };
