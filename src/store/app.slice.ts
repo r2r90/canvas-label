@@ -22,7 +22,15 @@ const defaultTextConfig = {
   fontFamily: "Roboto",
 };
 
-const defaultImageConfig = {};
+const defaultImageConfig = {
+  x: 50,
+  y: 50,
+  opacity: 1,
+  offsetX: 0,
+  offsetY: 0,
+  scaleX: 1,
+  scaleY: 1,
+};
 
 export const appSlice = createSlice({
   name: "app",
@@ -35,17 +43,27 @@ export const appSlice = createSlice({
         id: textId,
         ...defaultTextConfig,
       });
-
-      console.log(current(state.texts));
     },
 
-    addImage: (state, action: PayloadAction<ChangeEvent<HTMLInputElement>>) => {
-      const file = action.payload.target.files?.[0];
+    addImage: (
+      state,
+      action: PayloadAction<{
+        imageUrl: string;
+        width: number;
+        height: number;
+      }>,
+    ) => {
+      const file = action.payload;
       if (!file) return;
       const imageId = v1();
-      const imageUrl = URL.createObjectURL(file);
-      state.images.push({ imageUrl, id: imageId });
-      console.log(current(state.images));
+
+      state.images.push({
+        imageUrl: action.payload.imageUrl,
+        id: imageId,
+        width: action.payload.width,
+        height: action.payload.height,
+        ...defaultImageConfig,
+      });
     },
 
     selectItem: (state, action: PayloadAction<string>) => {

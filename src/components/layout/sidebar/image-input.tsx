@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { type ChangeEvent } from "react";
 import {
   Popover,
   PopoverContent,
@@ -16,7 +16,17 @@ function ImageInput() {
   const dispatch = useAppDispatch();
 
   const handleImageUploaded = (e: ChangeEvent<HTMLInputElement>) => {
-    dispatch(addImage(e));
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const img = document.createElement("img");
+    const imageUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      dispatch(addImage({ imageUrl, width: img.width, height: img.height }));
+      img.remove();
+    };
+    img.src = imageUrl;
+    img.style.cssText = "display: none;";
+    document.body.appendChild(img);
   };
 
   return (
