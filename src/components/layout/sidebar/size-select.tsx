@@ -5,14 +5,21 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { PiTextT } from "react-icons/pi";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { addText } from "@/store/app.slice";
-import { SlSizeFullscreen } from "react-icons/sl";
+import { RxMove } from "react-icons/rx";
+import { useAppDispatch } from "@/hooks";
+import { updateStage } from "@/store/app.slice";
 
 const SizeSelect = () => {
+  const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
+
+  const handleStageSizeSelect = (
+    width: number | undefined,
+    height: number | undefined,
+  ) => {
+    dispatch(updateStage({ width, height }));
+  };
 
   const handleSizeSelect = () => {
     setOpen(false);
@@ -22,10 +29,10 @@ const SizeSelect = () => {
       <PopoverTrigger asChild>
         <Button
           onClick={() => setOpen(true)}
-          variant="secondary"
+          variant="outline"
           className="text-xl"
         >
-          <SlSizeFullscreen />
+          <RxMove />
         </Button>
       </PopoverTrigger>
       <PopoverContent side="right" className="mt-4">
@@ -35,17 +42,23 @@ const SizeSelect = () => {
           </CardHeader>
 
           <div className="flex flex-col gap-2">
-            <Button>Petit Format</Button>
-            <Button>Moyen Format</Button>
-            <Button>Grand Format</Button>
+            <Button onClick={() => handleStageSizeSelect(350, 400)}>
+              Petit Format
+            </Button>
+            <Button onClick={() => handleStageSizeSelect(500, 500)}>
+              Moyen Format
+            </Button>
+            <Button onClick={() => handleStageSizeSelect(800, 600)}>
+              Grand Format
+            </Button>
           </div>
 
-          <CardFooter className="mt-8 justify-between">
-            <Button variant="ghost" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSizeSelect}>Submit</Button>
-          </CardFooter>
+          {/*<CardFooter className="mt-8 justify-between">*/}
+          {/*  <Button variant="ghost" onClick={() => setOpen(false)}>*/}
+          {/*    Cancel*/}
+          {/*  </Button>*/}
+          {/*  <Button onClick={handleSizeSelect}>Submit</Button>*/}
+          {/*</CardFooter>*/}
         </Card>
       </PopoverContent>
     </Popover>

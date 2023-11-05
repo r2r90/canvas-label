@@ -1,12 +1,11 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { PiFrameCornersDuotone, PiImageDuotone } from "react-icons/pi";
-import { Input } from "@/components/ui/input";
+import { PiFrameCornersDuotone } from "react-icons/pi";
 import { useAppDispatch } from "@/hooks";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -25,7 +24,7 @@ export function SelectTemplate() {
 
         <Card className="p-2">
           <CardHeader>
-            <CardTitle className="text-center">Choisissez un cadre</CardTitle>
+            <CardTitle className="text-center">Cadre</CardTitle>
           </CardHeader>
         </Card>
       </PopoverContent>

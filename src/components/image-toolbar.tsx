@@ -9,7 +9,9 @@ import { Separator } from "@/components/ui/separator";
 export function ImageToolbar({ selectedItemId, currentImage }) {
   const dispatch = useAppDispatch();
   const flipImageVerticaly = () => {
-    const editOffsetY = currentImage.height / 2;
+    const currentScale = currentImage.scaleY;
+    let editOffsetY = currentImage.height;
+    if (currentScale < 0) editOffsetY = 0;
     const editScaleY = -1 * currentImage.scaleY;
     dispatch(
       updateImage({
@@ -21,7 +23,9 @@ export function ImageToolbar({ selectedItemId, currentImage }) {
   };
 
   const flipImageHorizontaly = () => {
-    const editOffsetX = currentImage.width / 2;
+    const currentScale = currentImage.scaleX;
+    let editOffsetX = currentImage.width;
+    if (currentScale < 0) editOffsetX = 0;
     const editScaleX = -1 * currentImage.scaleX;
     dispatch(
       updateImage({

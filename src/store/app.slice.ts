@@ -1,25 +1,23 @@
 import type { TransformableImageProps } from "@/components/transformable-image";
 import type { TransformableTextProps } from "@/components/transformable-text";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { ChangeEvent } from "react";
-
-import { createSlice, current } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { v1 } from "uuid";
-import type { TextConfig } from "konva/lib/shapes/Text";
-import type { ImageConfig } from "konva/lib/shapes/Image";
+import { type RectConfig } from "konva/lib/shapes/Rect";
 
 const initialState = {
+  stage: { width: 500, height: 500 },
   selectedItemId: null as string | null,
   images: [] as TransformableImageProps["imageProps"][],
   texts: [] as TransformableTextProps["textProps"][],
+  backgroundRects: [] as RectConfig[],
 };
-
-type InitialState = typeof initialState;
 
 const defaultTextConfig = {
   fontSize: 16,
   align: "center",
   fontFamily: "Roboto",
+  zIndex: 3,
 };
 
 const defaultImageConfig = {
@@ -30,6 +28,7 @@ const defaultImageConfig = {
   offsetY: 0,
   scaleX: 1,
   scaleY: 1,
+  zIndex: 1,
 };
 
 export const appSlice = createSlice({
@@ -42,6 +41,19 @@ export const appSlice = createSlice({
         text: action.payload.initialValue,
         id: textId,
         ...defaultTextConfig,
+      });
+    },
+
+    selectBackground: (state, action: PayloadAction<string>) => {
+      state.backgroundRects = [];
+      state.backgroundRects.push({
+        x: 0,
+        y: 0,
+        stroke: "black",
+        z_index: 0,
+        width: state.stage.width,
+        height: state.stage.height,
+        fill: action.payload,
       });
     },
 
@@ -72,6 +84,13 @@ export const appSlice = createSlice({
 
     deselectItem: (state) => {
       state.selectedItemId = null;
+    },
+
+    updateStage: (
+      state,
+      action: PayloadAction<{ width?: number; height?: number }>,
+    ) => {
+      state.stage = { ...state.stage, ...action.payload };
     },
 
     updateText: (
@@ -126,4 +145,6 @@ export const {
   updateText,
   updateImage,
   deleteShape,
+  updateStage,
+  selectBackground,
 } = appSlice.actions;

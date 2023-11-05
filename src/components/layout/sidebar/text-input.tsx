@@ -8,10 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { addText } from "@/store/app.slice";
 import { useAppDispatch } from "@/hooks";
-import { Input } from "@/components/ui/input";
-import { PiTextT } from "react-icons/pi";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { RxText } from "react-icons/rx";
 
 export function TextInput() {
   const dispatch = useAppDispatch();
@@ -30,16 +28,16 @@ export function TextInput() {
       <PopoverTrigger asChild>
         <Button
           onClick={() => setOpen(true)}
-          variant="secondary"
+          variant="outline"
           className="text-xl"
         >
-          <PiTextT />
+          <RxText />
         </Button>
       </PopoverTrigger>
       <PopoverContent side="right" className="mt-4">
         <Card className="p-3">
-          <CardHeader>
-            <CardTitle>Ajouter votre text</CardTitle>
+          <CardHeader className="pt-2">
+            <CardTitle className="text-center">Text</CardTitle>
           </CardHeader>
           <Textarea
             id="description"

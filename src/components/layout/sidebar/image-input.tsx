@@ -6,11 +6,11 @@ import {
 } from "@/components/ui/popover";
 
 import { Button } from "@/components/ui/button";
-import { PiImageDuotone } from "react-icons/pi";
 import { Input } from "@/components/ui/input";
 import { addImage } from "@/store/app.slice";
 import { useAppDispatch } from "@/hooks";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { RxImage } from "react-icons/rx";
 
 function ImageInput() {
   const dispatch = useAppDispatch();
@@ -32,8 +32,8 @@ function ImageInput() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="secondary" className="text-xl">
-          <PiImageDuotone />
+        <Button variant="outline" className="text-xl">
+          <RxImage />
         </Button>
       </PopoverTrigger>
       <PopoverContent side="right">

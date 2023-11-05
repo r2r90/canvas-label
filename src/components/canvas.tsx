@@ -1,24 +1,20 @@
 import { TransformableImage } from "@/components/transformable-image";
-
 import type { KonvaEventObject } from "konva/lib/Node";
-
-import { Layer, Stage } from "react-konva";
+import { Layer, Rect, Stage } from "react-konva";
 import TransformableText from "./transformable-text";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { appSlice, deselectItem } from "@/store/app.slice";
-import { TextToolbar } from "./text-toolbar";
 import { useEffect, useState } from "react";
-import { EditableText } from "@/components/editable-resizable-text";
-import { ImageToolbar } from "@/components/image-toolbar";
 import { Toolbar } from "@/components/toolbar";
 
 const Canvas = () => {
   const dispatch = useAppDispatch();
-
+  const stage = useAppSelector((state) => state.app.stage);
   const selectedItemId = useAppSelector((state) => state.app.selectedItemId);
   const selectItem = (id: string) => dispatch(appSlice.actions.selectItem(id));
   const texts = useAppSelector((state) => state.app.texts);
   const images = useAppSelector((state) => state.app.images);
+  const backgroundRects = useAppSelector((state) => state.app.backgroundRects);
 
   const deselectHandler = (
     e: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>,
@@ -32,9 +28,6 @@ const Canvas = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
-  const [text, setText] = useState("Click to resize. Double click to edit.");
-  const [width, setWidth] = useState(200);
-  const [height, setHeight] = useState(200);
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
@@ -61,8 +54,8 @@ const Canvas = () => {
 
       <Stage
         className="m-[3rem] bg-white"
-        width={600}
-        height={500}
+        width={stage.width}
+        height={stage.height}
         onTouchStart={deselectHandler}
         onMouseDown={deselectHandler}
       >
@@ -94,23 +87,20 @@ const Canvas = () => {
             );
           })}
 
-          {/*<EditableText*/}
-          {/*  x={20}*/}
-          {/*  y={40}*/}
-          {/*  text={text}*/}
-          {/*  width={width}*/}
-          {/*  height={height}*/}
-          {/*  onResize={(newWidth, newHeight) => {*/}
-          {/*    setWidth(newWidth);*/}
-          {/*    setHeight(newHeight);*/}
-          {/*  }}*/}
-          {/*  isEditing={isEditing}*/}
-          {/*  isTransforming={isTransforming}*/}
-          {/*  onToggleEdit={toggleEdit}*/}
-          {/*  onToggleTransform={toggleTransforming}*/}
-          {/*  onChange={setText}*/}
-          {/*/>*/}
+          {backgroundRects.map((rect, i) => {
+            return (
+              <Rect
+                key={i}
+                width={rect.width}
+                height={rect.width}
+                fill={rect.fill}
+              />
+            );
+          })}
         </Layer>
+        {/*  <Layer>
+          <Text zIndex={10} x={30} y={200} fontSize={48} text="Hello" />
+        </Layer>*/}
       </Stage>
     </div>
   );

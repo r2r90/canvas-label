@@ -3,8 +3,6 @@ import { ImageToolbar } from "@/components/image-toolbar";
 import { TextToolbar } from "@/components/text-toolbar";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { updateText } from "@/store/app.slice";
-import { BsTrash3 } from "react-icons/bs";
-import { Button } from "@/components/ui/button";
 import { DeleteShapeButton } from "@/components/delete-shape-button";
 import { Separator } from "@/components/ui/separator";
 
