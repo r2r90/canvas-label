@@ -1,28 +1,41 @@
 import { TransformableImage } from "@/components/transformable-image";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { Layer, Rect, Stage } from "react-konva";
-import TransformableText from "./transformable-text";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { appSlice, deselectItem } from "@/store/app.slice";
-import { useEffect, useState } from "react";
+import {
+  appSlice,
+  deselectItem,
+  setStageScale,
+  StageItemType,
+  updateImage,
+  updateText,
+} from "@/store/app.slice";
+import { useEffect, useState, type MouseEvent } from "react";
 import { Toolbar } from "@/components/toolbar";
+import type Konva from "konva";
+import TransformableText from "@/components/transformable-text";
 
 const Canvas = () => {
   const dispatch = useAppDispatch();
   const stage = useAppSelector((state) => state.app.stage);
   const selectedItemId = useAppSelector((state) => state.app.selectedItemId);
   const selectItem = (id: string) => dispatch(appSlice.actions.selectItem(id));
-  const texts = useAppSelector((state) => state.app.texts);
-  const images = useAppSelector((state) => state.app.images);
-  const backgroundRects = useAppSelector((state) => state.app.backgroundRects);
+  const items = useAppSelector((state) => state.app.items);
 
+  const backgroundRect = useAppSelector((state) => state.app.background);
+  const backgroundId = "background";
   const deselectHandler = (
     e: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>,
   ) => {
-    const clickedOnEmpty = e.target === e.target.getStage();
+    const target = e.target;
+    const clickedOnEmpty =
+      target === target.getStage() ||
+      (typeof target === "object" && target.attrs.id === backgroundId);
+
     if (!clickedOnEmpty) {
       return;
     }
+    console.log(target);
     dispatch(deselectItem());
   };
 
@@ -48,60 +61,123 @@ const Canvas = () => {
     setSelected(!isTransforming);
   }
 
+  const handleWheel = (e: Konva.KonvaEventObject<WheelEvent>) => {
+    e.evt.preventDefault();
+
+    const scaleBy = 1.02;
+    const targetStage = e.target.getStage()!;
+    const oldScale = targetStage.scaleX();
+
+    const mousePointTo = {
+      x:
+        targetStage.getPointerPosition().x / oldScale -
+        targetStage.x() / oldScale,
+      y:
+        targetStage.getPointerPosition().y / oldScale -
+        targetStage.y() / oldScale,
+    };
+
+    const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+    dispatch(
+      setStageScale({
+        scale: newScale,
+        x:
+          (targetStage.getPointerPosition().x / newScale - mousePointTo.x) *
+          newScale,
+        y:
+          (targetStage.getPointerPosition().y / newScale - mousePointTo.y) *
+          newScale,
+      }),
+    );
+  };
+
   return (
-    <div className="flex h-screen w-full flex-col items-center">
+    <div className="relative flex h-full w-full flex-col items-center">
       <Toolbar />
-
-      <Stage
-        className="m-[3rem] bg-white"
-        width={stage.width}
-        height={stage.height}
-        onTouchStart={deselectHandler}
-        onMouseDown={deselectHandler}
+      <div
+        className={"flex h-full w-full items-center justify-center"}
+        onClick={(e) => {
+          if (e.target !== e.currentTarget) {
+            return;
+          }
+          dispatch(deselectItem());
+        }}
       >
-        <Layer>
-          {images.map((image) => {
-            return (
-              <TransformableImage
-                onSelect={() => selectItem(image.id)}
-                isSelected={image.id === selectedItemId}
-                onChange={(newAttrs) => {
-                  images.map((i) => (i.id === image.id ? newAttrs : i));
-                }}
-                imageProps={image}
-                key={image.id}
-              />
-            );
-          })}
-          {texts.map((text) => {
-            return (
-              <TransformableText
-                onSelect={() => selectItem(text.id)}
-                isSelected={text.id === selectedItemId}
-                onChange={(newAttrs) => {
-                  texts.map((t) => (t.id === text.id ? newAttrs : t));
-                }}
-                textProps={text}
-                key={text.id}
-              />
-            );
-          })}
-
-          {backgroundRects.map((rect, i) => {
-            return (
+        <Stage
+          className="bg-white"
+          width={stage.width}
+          height={stage.height}
+          onTouchStart={deselectHandler}
+          onMouseDown={deselectHandler}
+          x={stage.x}
+          y={stage.y}
+          scaleX={stage.scale}
+          scaleY={stage.scale}
+          // onWheel={handleWheel}
+        >
+          <Layer>
+            {!!backgroundRect && (
               <Rect
-                key={i}
-                width={rect.width}
-                height={rect.width}
-                fill={rect.fill}
+                width={stage.width}
+                height={stage.height}
+                fill={backgroundRect.fill}
+                onTouchStart={deselectHandler}
+                onClick={deselectHandler}
+                id={backgroundId}
               />
-            );
-          })}
-        </Layer>
-        {/*  <Layer>
-          <Text zIndex={10} x={30} y={200} fontSize={48} text="Hello" />
+            )}
+            {items.map((item) => {
+              if (item.type === StageItemType.Image) {
+                return (
+                  <TransformableImage
+                    id={item.id}
+                    onSelect={() => selectItem(item.id)}
+                    isSelected={item.id === selectedItemId}
+                    onChange={(newAttrs) => {
+                      dispatch(updateImage({ id: item.id, ...newAttrs }));
+                    }}
+                    imageProps={item.params}
+                    key={item.id}
+                  />
+                );
+              }
+              if (item.type === StageItemType.Text) {
+                return (
+                  <TransformableText
+                    onSelect={() => selectItem(item.id)}
+                    isSelected={item.id === selectedItemId}
+                    onChange={(newAttrs) => {
+                      dispatch(updateText({ id: item.id, ...newAttrs }));
+                    }}
+                    textProps={item.params}
+                    key={item.id}
+                    id={item.id}
+                  />
+                );
+              }
+            })}
+          </Layer>
+          {/* <Layer>
+          <Rect
+            x={50}
+            y={220}
+            fontSize={48}
+            width={100}
+            height={100}
+            fill="red"
+          />
+          <Rect
+            x={30}
+            y={200}
+            fontSize={48}
+            width={100}
+            height={100}
+            fill="yellow"
+          />
         </Layer>*/}
-      </Stage>
+        </Stage>
+      </div>
     </div>
   );
 };

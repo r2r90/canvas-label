@@ -21,6 +21,7 @@ export function FontSizeSelector({ currentText, selectedItemId }: Props) {
       updateText({
         id: selectedItemId,
         fontSize: e,
+        height: e,
       }),
     );
   };

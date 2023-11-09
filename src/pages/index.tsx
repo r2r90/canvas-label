@@ -10,9 +10,7 @@ export default function Home() {
         <title>Labbel Application</title>
         <link rel="icon" href="/logo.png" />
       </Head>
-      <div className="flex">
-        <Canvas />
-      </div>
+      <Canvas />
     </>
   );
 }

@@ -4,20 +4,43 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { v1 } from "uuid";
 import { type RectConfig } from "konva/lib/shapes/Rect";
+import { type WritableDraft } from "immer/src/types/types-external";
+
+export enum StageItemType {
+  Text = "text",
+  Image = "image",
+}
+
+type StageItemCommon = {
+  id: string;
+  order: number;
+};
+
+export type StageTextItem = {
+  type: StageItemType.Text;
+  params: TransformableTextProps["textProps"];
+};
+
+export type StageImageItem = {
+  type: StageItemType.Image;
+  params: TransformableImageProps["imageProps"];
+};
+
+type StageItemSpecific = StageTextItem | StageImageItem;
+
+type StageItem = StageItemCommon & StageItemSpecific;
 
 const initialState = {
-  stage: { width: 500, height: 500 },
+  stage: { width: 500, height: 500, scale: 1, x: 0, y: 0 },
+  items: [] as StageItem[],
   selectedItemId: null as string | null,
-  images: [] as TransformableImageProps["imageProps"][],
-  texts: [] as TransformableTextProps["textProps"][],
-  backgroundRects: [] as RectConfig[],
+  background: null as RectConfig | null,
 };
 
 const defaultTextConfig = {
   fontSize: 16,
   align: "center",
   fontFamily: "Roboto",
-  zIndex: 3,
 };
 
 const defaultImageConfig = {
@@ -28,35 +51,41 @@ const defaultImageConfig = {
   offsetY: 0,
   scaleX: 1,
   scaleY: 1,
-  zIndex: 1,
 };
+
+export enum OrderDirection {
+  Up = "up",
+  Down = "down",
+}
+
+type AddStageItemAction = PayloadAction<StageItem>;
 
 export const appSlice = createSlice({
   name: "app",
   initialState,
   reducers: {
+    setStageScale: (
+      state,
+      action: PayloadAction<{ x: number; y: number; scale: number }>,
+    ) => {
+      state.stage = {
+        ...state.stage,
+        ...action.payload,
+      };
+    },
     addText: (state, action: PayloadAction<{ initialValue: string }>) => {
       const textId = v1();
-      state.texts.push({
-        text: action.payload.initialValue,
+      state.items.push({
+        type: StageItemType.Text,
         id: textId,
-        ...defaultTextConfig,
+        order: state.items.length + 1,
+        params: {
+          text: action.payload.initialValue,
+
+          ...defaultTextConfig,
+        },
       });
     },
-
-    selectBackground: (state, action: PayloadAction<string>) => {
-      state.backgroundRects = [];
-      state.backgroundRects.push({
-        x: 0,
-        y: 0,
-        stroke: "black",
-        z_index: 0,
-        width: state.stage.width,
-        height: state.stage.height,
-        fill: action.payload,
-      });
-    },
-
     addImage: (
       state,
       action: PayloadAction<{
@@ -68,14 +97,100 @@ export const appSlice = createSlice({
       const file = action.payload;
       if (!file) return;
       const imageId = v1();
-
-      state.images.push({
-        imageUrl: action.payload.imageUrl,
+      state.items.push({
+        type: StageItemType.Image,
         id: imageId,
-        width: action.payload.width,
-        height: action.payload.height,
-        ...defaultImageConfig,
+        order: state.items.length + 1,
+        params: {
+          imageUrl: action.payload.imageUrl,
+          width: action.payload.width,
+          height: action.payload.height,
+          ...defaultImageConfig,
+        },
       });
+    },
+
+    updateImageOrder: (
+      state,
+      action: PayloadAction<{ id: string; direction: OrderDirection }>,
+    ) => {
+      const imageToUpdateIndex = state.items.findIndex(
+        (img) => img.id === action.payload.id,
+      );
+      const imageToUpdate = state.items[imageToUpdateIndex];
+
+      if (!imageToUpdate) return;
+      const isLast = imageToUpdate.order === state.items.length;
+      const isFirst = imageToUpdate.order === 1;
+
+      let newOrder = imageToUpdate.order;
+      if (action.payload.direction === OrderDirection.Up && !isLast) {
+        newOrder = imageToUpdate.order + 1;
+      }
+      if (action.payload.direction === OrderDirection.Down && !isFirst) {
+        newOrder = imageToUpdate.order - 1;
+      }
+
+      state.items[imageToUpdateIndex] = {
+        ...imageToUpdate,
+        order: newOrder,
+      };
+
+      state.items.sort((a, b) => {
+        if (a === b) return 0;
+        if (a < b) return 1;
+        return -1;
+      });
+    },
+
+    updateItemOrder: (
+      state,
+      action: PayloadAction<{ id: string; direction: OrderDirection }>,
+    ) => {
+      const itemToUpdateIndex = state.items.findIndex(
+        (item) => item.id === action.payload.id,
+      );
+      const itemToUpdate = state.items[itemToUpdateIndex];
+
+      if (!itemToUpdate) return;
+      const isLast = itemToUpdate.order === state.items.length;
+      const isFirst = itemToUpdate.order === 1;
+
+      let newOrder = itemToUpdate.order;
+      if (action.payload.direction === OrderDirection.Up && !isLast) {
+        newOrder = itemToUpdate.order + 1;
+      }
+      if (action.payload.direction === OrderDirection.Down && !isFirst) {
+        newOrder = itemToUpdate.order - 1;
+      }
+      const prevItemIndex = state.items.findIndex(
+        (item) => item.order === newOrder,
+      );
+      const prevItem = state.items[prevItemIndex];
+
+      if (!prevItem) return;
+
+      state.items[prevItemIndex] = {
+        ...prevItem,
+        order: itemToUpdate.order,
+      };
+
+      state.items[itemToUpdateIndex] = {
+        ...itemToUpdate,
+        order: newOrder,
+      };
+
+      state.items.sort((a, b) => {
+        if (a === b) return 0;
+        if (a < b) return 1;
+        return -1;
+      });
+    },
+
+    selectBackground: (state, action: PayloadAction<string>) => {
+      state.background = {
+        fill: action.payload,
+      };
     },
 
     selectItem: (state, action: PayloadAction<string>) => {
@@ -95,56 +210,61 @@ export const appSlice = createSlice({
 
     updateText: (
       state,
-      action: PayloadAction<{ id: string } & Partial<TransformableTextProps>>,
+      action: PayloadAction<{ id: string } & Partial<StageTextItem["params"]>>,
     ) => {
-      const textToUpdateIndex = state.texts.findIndex(
-        (t) => t.id === action.payload.id,
-      );
-      const textToUpdate = state.texts[textToUpdateIndex];
+      const { id, ...params } = action.payload;
+      const textToUpdateIndex = state.items.findIndex((t) => t.id === id);
+      const textToUpdate = state.items[textToUpdateIndex];
 
-      if (!textToUpdate) return;
+      if (!textToUpdate || textToUpdate.type !== StageItemType.Text) return;
 
-      state.texts[textToUpdateIndex] = {
+      state.items[textToUpdateIndex] = {
         ...textToUpdate,
-        ...action.payload,
+        params: {
+          ...textToUpdate.params,
+          ...params,
+        },
       };
     },
 
     updateImage: (
       state,
-      action: PayloadAction<{ id: string } & Partial<TransformableImageProps>>,
+      action: PayloadAction<{ id: string } & Partial<StageImageItem["params"]>>,
     ) => {
-      const imageToUpdateIndex = state.images.findIndex(
-        (img) => img.id === action.payload.id,
-      );
-      const imageToUpdate = state.images[imageToUpdateIndex];
+      const { id, ...params } = action.payload;
+      const imageToUpdateIndex = state.items.findIndex((img) => img.id === id);
+      const imageToUpdate = state.items[imageToUpdateIndex];
 
-      if (!imageToUpdate) return;
+      if (!imageToUpdate || imageToUpdate.type !== StageItemType.Image) return;
 
-      state.images[imageToUpdateIndex] = {
+      (state.items[imageToUpdateIndex] as WritableDraft<StageImageItem>) = {
         ...imageToUpdate,
-        ...action.payload,
+        params: {
+          ...imageToUpdate.params,
+          ...params,
+        },
       };
     },
 
-    deleteShape: (state, action: PayloadAction<string>) => {
+    deleteStageItem: (state, action: PayloadAction<string>) => {
       return {
         ...state,
-        texts: state.texts.filter((shape) => shape.id !== action.payload),
-        images: state.images.filter((shape) => shape.id !== action.payload),
+        items: state.items.filter((item) => item.id !== action.payload),
       };
     },
   },
 });
 
 export const {
+  setStageScale,
   addImage,
   addText,
   selectItem,
   deselectItem,
   updateText,
   updateImage,
-  deleteShape,
+  deleteStageItem,
   updateStage,
   selectBackground,
+  updateItemOrder,
 } = appSlice.actions;

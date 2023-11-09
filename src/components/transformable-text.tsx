@@ -1,11 +1,10 @@
 import type { TextConfig } from "konva/lib/shapes/Text";
-import { useRef, type ElementRef, useEffect } from "react";
+import { type ElementRef, useEffect, useRef } from "react";
 import { Text, Transformer } from "react-konva";
-import * as console from "console";
 
 type TransformableTextConfig = Omit<TextConfig, "text"> & {
-  text?: TextConfig["text"];
-  id: string;
+  text?: string;
+  fill?: string;
   direction?: string;
   fontFamily: string;
   fontSize?: number;
@@ -26,6 +25,7 @@ export type TransformableTextProps = {
   isSelected: boolean;
   onSelect: () => void;
   onChange: (newAttrs: TransformableTextConfig) => void;
+  id: string;
 };
 
 const TransformableText = ({
@@ -33,6 +33,7 @@ const TransformableText = ({
   isSelected,
   onSelect,
   onChange,
+  id,
 }: TransformableTextProps) => {
   const textRef = useRef<ElementRef<typeof Text>>(null);
   const trRef = useRef<ElementRef<typeof Transformer>>(null);
@@ -100,6 +101,7 @@ const TransformableText = ({
       />
       {isSelected && (
         <Transformer
+          id={id}
           ref={trRef}
           boundBoxFunc={(oldBox, newBox) => {
             return { ...newBox, height: oldBox.height };

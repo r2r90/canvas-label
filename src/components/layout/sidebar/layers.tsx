@@ -7,8 +7,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RxStack } from "react-icons/rx";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { OrderDirection, updateItemOrder } from "@/store/app.slice";
 
 export const Layers = () => {
+  const dispatch = useAppDispatch();
+  const items = useAppSelector((state) => state.app.items);
+
+  const updateImageLayer = (id: string, direction: OrderDirection) => {
+    dispatch(
+      updateItemOrder({
+        id,
+        direction,
+      }),
+    );
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -22,7 +36,23 @@ export const Layers = () => {
             <CardTitle className="text-center">Layer</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-2">
-            <div className="flex h-[2rem] flex-col items-center justify-between rounded-md border-2 border-muted bg-popover"></div>
+            {items.map((item) => (
+              <div key={item.id} className="flex items-center gap-2 ">
+                {item.id}
+                <Button
+                  className="h-full"
+                  onClick={() => updateImageLayer(item.id, OrderDirection.Up)}
+                >
+                  +
+                </Button>
+                <Button
+                  className="h-full"
+                  onClick={() => updateImageLayer(item.id, OrderDirection.Down)}
+                >
+                  -
+                </Button>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </PopoverContent>

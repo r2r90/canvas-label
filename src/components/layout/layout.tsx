@@ -8,7 +8,7 @@ type Props = {
 
 export const Layout = ({ children }: Props) => {
   return (
-    <div className="overflow-hidden rounded-[0.5rem] border bg-background shadow">
+    <div className="h-full overflow-hidden rounded-[0.5rem] border bg-background shadow">
       <Navbar />
       <div className="flex h-full ">
         <Sidebar />

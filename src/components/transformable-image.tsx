@@ -4,13 +4,13 @@ import { Transformer, Image } from "react-konva";
 import useImage from "use-image";
 
 type TransformableImageConfig = Omit<ImageConfig, "image"> & {
-  image?: ImageConfig["image"];
+  image?: HTMLImageElement;
   imageUrl: string;
-  id: string;
 };
 
 export type TransformableImageProps = {
   imageProps: TransformableImageConfig;
+  id: string;
   isSelected: boolean;
   onSelect: () => void;
   onChange: (newAttrs: TransformableImageConfig) => void;
@@ -18,6 +18,7 @@ export type TransformableImageProps = {
 
 export const TransformableImage = ({
   imageProps,
+  id,
   isSelected,
   onSelect,
   onChange,
@@ -25,7 +26,6 @@ export const TransformableImage = ({
   const imageRef = useRef<ElementRef<typeof Image>>(null);
   const trRef = useRef<ElementRef<typeof Transformer>>(null);
   const [image] = useImage(imageProps.imageUrl);
-
 
   useEffect(() => {
     if (!imageRef.current) return;
@@ -40,6 +40,7 @@ export const TransformableImage = ({
   return (
     <>
       <Image
+        id={id}
         alt={"canvas image"}
         onClick={onSelect}
         onTap={onSelect}

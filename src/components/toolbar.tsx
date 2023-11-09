@@ -2,20 +2,18 @@ import React, { type ChangeEvent } from "react";
 import { ImageToolbar } from "@/components/image-toolbar";
 import { TextToolbar } from "@/components/text-toolbar";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { updateText } from "@/store/app.slice";
+import { StageItemType, updateText } from "@/store/app.slice";
 import { DeleteShapeButton } from "@/components/delete-shape-button";
 import { Separator } from "@/components/ui/separator";
 
 export const Toolbar = () => {
   const dispatch = useAppDispatch();
   const selectedItemId = useAppSelector((state) => state.app.selectedItemId);
-  const texts = useAppSelector((state) => state.app.texts);
-  const images = useAppSelector((state) => state.app.images);
+  const items = useAppSelector((state) => state.app.items);
 
-  const currentText = texts.find((t) => t.id === selectedItemId);
-  const currentImage = images.find((img) => img.id === selectedItemId);
+  const currentItem = items.find((t) => t.id === selectedItemId);
 
-  if (!selectedItemId) return null;
+  if (!currentItem || !selectedItemId) return null;
 
   const handleTextColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!selectedItemId) return;
@@ -28,17 +26,17 @@ export const Toolbar = () => {
   };
 
   return (
-    <div className=" flex h-[5rem] w-full gap-6 border border-t-0 bg-white p-[1rem]">
-      {currentText && (
+    <div className="inset absolute flex h-[5rem] w-full gap-6 border border-t-0 bg-white p-[1rem]">
+      {currentItem.type === StageItemType.Text && (
         <TextToolbar
-          currentText={currentText}
+          currentText={currentItem.params}
           selectedItemId={selectedItemId}
           onTextColorChange={handleTextColorChange}
         />
       )}
-      {currentImage && (
+      {currentItem.type === StageItemType.Image && (
         <ImageToolbar
-          currentImage={currentImage}
+          currentImage={currentItem.params}
           selectedItemId={selectedItemId}
         />
       )}

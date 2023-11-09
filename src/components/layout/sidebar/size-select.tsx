@@ -38,7 +38,7 @@ const SizeSelect = () => {
       <PopoverContent side="right" className="mt-4">
         <Card className="p-3">
           <CardHeader>
-            <CardTitle>Sélectionnez la taille d'étiquette</CardTitle>
+            <CardTitle>{`Sélectionnez la taille d'étiquette`}</CardTitle>
           </CardHeader>
 
           <div className="flex flex-col gap-2">

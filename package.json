@@ -8,7 +8,7 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start --port 3333"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
@@ -43,6 +43,7 @@
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
     "font-picker-react": "^3.5.2",
+    "immer": "^10.0.3",
     "konva": "^9.2.0",
     "lucide-react": "^0.279.0",
     "next": "^13.4.19",

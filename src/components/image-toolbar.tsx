@@ -2,11 +2,16 @@ import React from "react";
 import { TbFlipHorizontal, TbFlipVertical } from "react-icons/tb";
 import { Toggle } from "@/components/ui/toggle";
 import { useAppDispatch } from "@/hooks";
-import { updateImage } from "@/store/app.slice";
+import { type StageImageItem, updateImage } from "@/store/app.slice";
 import ImageOpacityTool from "@/components/image-editing-tools/image-opacity-tool";
 import { Separator } from "@/components/ui/separator";
 
-export function ImageToolbar({ selectedItemId, currentImage }) {
+type Props = {
+  selectedItemId: string;
+  currentImage: StageImageItem["params"];
+};
+
+export function ImageToolbar({ selectedItemId, currentImage }: Props) {
   const dispatch = useAppDispatch();
   const flipImageVerticaly = () => {
     const currentScale = currentImage.scaleY;

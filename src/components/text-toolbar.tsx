@@ -5,15 +5,11 @@ import { FontStyle } from "./texte-editing-tools/text-style-selector";
 import { FontAlign } from "./texte-editing-tools/text-align-selector";
 import { Separator } from "./ui/separator";
 import { SpacingSettings } from "./texte-editing-tools/text-spacing-settings";
-import { type TransformableTextProps } from "@/components/transformable-text";
-import { Button } from "@/components/ui/button";
-import { useAppDispatch } from "@/hooks";
-import { deleteShape } from "@/store/app.slice";
-import { DeleteShapeButton } from "@/components/delete-shape-button";
+import { type StageTextItem } from "@/store/app.slice";
 
 type Props = {
   selectedItemId: string;
-  currentText: TransformableTextProps["textProps"];
+  currentText: StageTextItem["params"];
   onTextColorChange: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 export const TextToolbar = ({
@@ -21,7 +17,6 @@ export const TextToolbar = ({
   selectedItemId,
   onTextColorChange,
 }: Props) => {
-  const dispatch = useAppDispatch();
   if (!currentText) return null;
 
   return (

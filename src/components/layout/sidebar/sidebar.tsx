@@ -6,7 +6,7 @@ import { Layers } from "@/components/layout/sidebar/layers";
 
 export function Sidebar() {
   return (
-    <div className="inline-flex h-full w-20 flex-col items-center justify-center gap-2 p-2">
+    <div className="flex h-full w-20 flex-col items-center gap-2 p-2 pt-4">
       <SizeSelect />
       <TextInput />
       <ImageInput />
