@@ -55,7 +55,7 @@ export const TransformableImage = ({
             y: e.target.y(),
           });
         }}
-        onTransformEnd={(e) => {
+        onTransformEnd={() => {
           const node = imageRef.current;
           if (!node) return;
 

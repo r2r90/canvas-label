@@ -5,14 +5,12 @@ import { useAppDispatch, useAppSelector } from "@/hooks";
 import {
   appSlice,
   deselectItem,
-  setStageScale,
   StageItemType,
   updateImage,
   updateText,
 } from "@/store/app.slice";
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { Toolbar } from "@/components/toolbar";
-import type Konva from "konva";
 import TransformableText from "@/components/transformable-text";
 
 const Canvas = () => {
@@ -56,41 +54,41 @@ const Canvas = () => {
     setSelected(!isEditing);
   }
 
-  function toggleTransforming() {
-    setIsTransforming(!isTransforming);
-    setSelected(!isTransforming);
-  }
-
-  const handleWheel = (e: Konva.KonvaEventObject<WheelEvent>) => {
-    e.evt.preventDefault();
-
-    const scaleBy = 1.02;
-    const targetStage = e.target.getStage()!;
-    const oldScale = targetStage.scaleX();
-
-    const mousePointTo = {
-      x:
-        targetStage.getPointerPosition().x / oldScale -
-        targetStage.x() / oldScale,
-      y:
-        targetStage.getPointerPosition().y / oldScale -
-        targetStage.y() / oldScale,
-    };
-
-    const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
-
-    dispatch(
-      setStageScale({
-        scale: newScale,
-        x:
-          (targetStage.getPointerPosition().x / newScale - mousePointTo.x) *
-          newScale,
-        y:
-          (targetStage.getPointerPosition().y / newScale - mousePointTo.y) *
-          newScale,
-      }),
-    );
-  };
+  // function toggleTransforming() {
+  //   setIsTransforming(!isTransforming);
+  //   setSelected(!isTransforming);
+  // }
+  //
+  // const handleWheel = (e: Konva.KonvaEventObject<WheelEvent>) => {
+  //   e.evt.preventDefault();
+  //
+  //   const scaleBy = 1.02;
+  //   const targetStage = e.target.getStage()!;
+  //   const oldScale = targetStage.scaleX();
+  //
+  //   const mousePointTo = {
+  //     x:
+  //       targetStage.getPointerPosition().x / oldScale -
+  //       targetStage.x() / oldScale,
+  //     y:
+  //       targetStage.getPointerPosition().y / oldScale -
+  //       targetStage.y() / oldScale,
+  //   };
+  //
+  //   const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+  //
+  //   dispatch(
+  //     setStageScale({
+  //       scale: newScale,
+  //       x:
+  //         (targetStage.getPointerPosition().x / newScale - mousePointTo.x) *
+  //         newScale,
+  //       y:
+  //         (targetStage.getPointerPosition().y / newScale - mousePointTo.y) *
+  //         newScale,
+  //     }),
+  //   );
+  // };
 
   return (
     <div className="relative flex h-full w-full flex-col items-center">

@@ -37,7 +37,7 @@ export function EditableTextInput({
         textAreaRef.current.scrollHeight + 3 + "px";
       textAreaRef.current.focus();
     }
-  }, []);
+  }, [height]);
   const style: CSSProperties = {
     textAlign: align,
     width: `${width}px`,
