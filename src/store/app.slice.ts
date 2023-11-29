@@ -39,8 +39,12 @@ const initialState = {
 
 const defaultTextConfig = {
   fontSize: 16,
-  align: "center",
+  align: "center" as const,
   fontFamily: "Roboto",
+  x: 100,
+  y: 100,
+  width: 100,
+  height: 16,
 };
 
 const defaultImageConfig = {
@@ -57,8 +61,6 @@ export enum OrderDirection {
   Up = "up",
   Down = "down",
 }
-
-type AddStageItemAction = PayloadAction<StageItem>;
 
 export const appSlice = createSlice({
   name: "app",

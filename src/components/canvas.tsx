@@ -145,6 +145,8 @@ const Canvas = () => {
               if (item.type === StageItemType.Text) {
                 return (
                   <TransformableText
+                    isEditing={isEditing}
+                    onEditChange={toggleEdit}
                     onSelect={() => selectItem(item.id)}
                     isSelected={item.id === selectedItemId}
                     onChange={(newAttrs) => {

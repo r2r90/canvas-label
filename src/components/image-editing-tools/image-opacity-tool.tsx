@@ -2,10 +2,9 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useAppDispatch } from "@/hooks";
-import { updateImage, updateText } from "@/store/app.slice";
+import { updateImage } from "@/store/app.slice";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import { type ImageConfig } from "konva/lib/shapes/Image";
-import { TransformableImageProps } from "@/components/transformable-image";
 
 type Props = {
   currentImage: ImageConfig;
@@ -20,12 +19,12 @@ export default function ImageOpacityTool({
 
   const value = currentImage.opacity ?? 1;
 
-  const handleOpacityChange = (e) => {
+  const handleOpacityChange = (values: number[]) => {
     if (!selectedItemId) return;
     dispatch(
       updateImage({
         id: selectedItemId,
-        opacity: e,
+        opacity: values[0],
       }),
     );
   };
@@ -35,20 +34,18 @@ export default function ImageOpacityTool({
       <HoverCardTrigger asChild>
         <div className="grid gap-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="fontSize">Opacity</Label>
+            <Label htmlFor="opacity">Opacity</Label>
             <span className="w-12 rounded-md border border-transparent px-2 py-0.5 text-right text-sm text-muted-foreground hover:border-border">
               {value}
             </span>
           </div>
           <Slider
-            id="fontSize"
+            id="opacity"
             min={0}
             max={1}
             defaultValue={[currentImage.opacity ?? 16]}
             step={0.1}
-            onValueChange={(e) => {
-              handleOpacityChange(e[0]);
-            }}
+            onValueChange={handleOpacityChange}
             className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
             aria-label="opacity"
           />

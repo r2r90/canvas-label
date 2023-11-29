@@ -4,7 +4,6 @@ import { Transformer, Image } from "react-konva";
 import useImage from "use-image";
 
 type TransformableImageConfig = Omit<ImageConfig, "image"> & {
-  image?: HTMLImageElement;
   imageUrl: string;
 };
 

@@ -1,6 +1,14 @@
 import type { TextConfig } from "konva/lib/shapes/Text";
-import { type ElementRef, useEffect, useRef } from "react";
+import {
+  type CSSProperties,
+  type ElementRef,
+  type KeyboardEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Text, Transformer } from "react-konva";
+import { EditableTextInput } from "@/components/editable-text-input";
 
 type TransformableTextConfig = Omit<TextConfig, "text"> & {
   text?: string;
@@ -11,13 +19,15 @@ type TransformableTextConfig = Omit<TextConfig, "text"> & {
   fontStyle?: string;
   fontVariant?: string;
   textDecoration?: string;
-  align?: string;
+  align?: CSSProperties["textAlign"];
   verticalAlign?: string;
   padding?: number;
   lineHeight?: number;
   letterSpacing?: number;
   wrap?: string;
   ellipsis?: boolean;
+  x: number;
+  y: number;
 };
 
 export type TransformableTextProps = {
@@ -26,6 +36,8 @@ export type TransformableTextProps = {
   onSelect: () => void;
   onChange: (newAttrs: TransformableTextConfig) => void;
   id: string;
+  isEditing?: boolean;
+  onEditChange?: (isEditing: boolean) => void;
 };
 
 const TransformableText = ({
@@ -34,10 +46,33 @@ const TransformableText = ({
   onSelect,
   onChange,
   id,
+  isEditing,
+  onEditChange,
 }: TransformableTextProps) => {
+  console.log(textProps);
+  const [value, setText] = useState<string | undefined>("");
   const textRef = useRef<ElementRef<typeof Text>>(null);
   const trRef = useRef<ElementRef<typeof Transformer>>(null);
   const text = textProps.text;
+  console.log(textRef.current);
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      onChange({
+        ...textProps,
+        text: value,
+      });
+      onEditChange?.(false);
+    }
+    if (e.key === "Escape") {
+      setText("");
+      onEditChange?.(false);
+    }
+  };
+
+  const handleDblClick = () => {
+    setText(text);
+    onEditChange?.(true);
+  };
 
   useEffect(() => {
     if (!textRef.current) return;
@@ -48,7 +83,24 @@ const TransformableText = ({
       trRef.current?.getLayer()?.batchDraw();
     }
   }, [isSelected]);
-
+  if (isEditing) {
+    return (
+      <EditableTextInput
+        fontSize={textProps.fontSize ?? 16}
+        fontFamily={textProps.fontFamily}
+        align={textProps.align}
+        x={textProps.x}
+        y={textProps.y}
+        width={textProps.width}
+        height={textProps.height}
+        onChange={(e) => {
+          setText(e.target.value);
+        }}
+        onKeyDown={handleKeyDown}
+        value={value}
+      />
+    );
+  }
   return (
     <>
       <Text
@@ -78,7 +130,8 @@ const TransformableText = ({
             y: e.target.y(),
           });
         }}
-        onTransformEnd={(e) => {
+        onDblClick={handleDblClick}
+        onTransformEnd={() => {
           const node = textRef.current;
           if (!node) return;
 
@@ -111,4 +164,5 @@ const TransformableText = ({
     </>
   );
 };
+
 export default TransformableText;
