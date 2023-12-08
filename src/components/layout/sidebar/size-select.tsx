@@ -42,13 +42,13 @@ const SizeSelect = () => {
           </CardHeader>
 
           <div className="flex flex-col gap-2">
-            <Button onClick={() => handleStageSizeSelect(350, 400)}>
+            <Button onClick={() => handleStageSizeSelect(269.32, 165.87)}>
               Petit Format
             </Button>
-            <Button onClick={() => handleStageSizeSelect(500, 500)}>
+            <Button onClick={() => handleStageSizeSelect(323.15, 227)}>
               Moyen Format
             </Button>
-            <Button onClick={() => handleStageSizeSelect(800, 600)}>
+            <Button onClick={() => handleStageSizeSelect(410, 289)}>
               Grand Format
             </Button>
           </div>

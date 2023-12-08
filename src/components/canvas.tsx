@@ -12,6 +12,8 @@ import {
 import { useEffect, useState } from "react";
 import { Toolbar } from "@/components/toolbar";
 import TransformableText from "@/components/transformable-text";
+import LayerBorder from "@/components/layer-border";
+import { CANVAS_PADDING_X, CANVAS_PADDING_Y } from "@/consts/canvas-params";
 
 const Canvas = () => {
   const dispatch = useAppDispatch();
@@ -33,7 +35,6 @@ const Canvas = () => {
     if (!clickedOnEmpty) {
       return;
     }
-    console.log(target);
     dispatch(deselectItem());
   };
 
@@ -53,42 +54,6 @@ const Canvas = () => {
     setIsEditing(!isEditing);
     setSelected(!isEditing);
   }
-
-  // function toggleTransforming() {
-  //   setIsTransforming(!isTransforming);
-  //   setSelected(!isTransforming);
-  // }
-  //
-  // const handleWheel = (e: Konva.KonvaEventObject<WheelEvent>) => {
-  //   e.evt.preventDefault();
-  //
-  //   const scaleBy = 1.02;
-  //   const targetStage = e.target.getStage()!;
-  //   const oldScale = targetStage.scaleX();
-  //
-  //   const mousePointTo = {
-  //     x:
-  //       targetStage.getPointerPosition().x / oldScale -
-  //       targetStage.x() / oldScale,
-  //     y:
-  //       targetStage.getPointerPosition().y / oldScale -
-  //       targetStage.y() / oldScale,
-  //   };
-  //
-  //   const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
-  //
-  //   dispatch(
-  //     setStageScale({
-  //       scale: newScale,
-  //       x:
-  //         (targetStage.getPointerPosition().x / newScale - mousePointTo.x) *
-  //         newScale,
-  //       y:
-  //         (targetStage.getPointerPosition().y / newScale - mousePointTo.y) *
-  //         newScale,
-  //     }),
-  //   );
-  // };
 
   return (
     <div className="relative flex h-full w-full flex-col items-center">
@@ -112,7 +77,6 @@ const Canvas = () => {
           y={stage.y}
           scaleX={stage.scale}
           scaleY={stage.scale}
-          // onWheel={handleWheel}
         >
           <Layer>
             {!!backgroundRect && (
@@ -125,7 +89,14 @@ const Canvas = () => {
                 id={backgroundId}
               />
             )}
-            {items.map((item) => {
+          </Layer>
+          <Layer
+            clipX={CANVAS_PADDING_X}
+            clipY={CANVAS_PADDING_Y}
+            clipWidth={stage.width - 2 * CANVAS_PADDING_X}
+            clipHeight={stage.height - 2 * CANVAS_PADDING_Y}
+          >
+            {items.toReversed().map((item) => {
               if (item.type === StageItemType.Image) {
                 return (
                   <TransformableImage
@@ -158,24 +129,9 @@ const Canvas = () => {
               }
             })}
           </Layer>
-          {/* <Layer>
-          <Rect
-            x={50}
-            y={220}
-            fontSize={48}
-            width={100}
-            height={100}
-            fill="red"
-          />
-          <Rect
-            x={30}
-            y={200}
-            fontSize={48}
-            width={100}
-            height={100}
-            fill="yellow"
-          />
-        </Layer>*/}
+          {/*<Legales />*/}
+
+          <LayerBorder />
         </Stage>
       </div>
     </div>

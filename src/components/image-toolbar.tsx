@@ -1,10 +1,12 @@
 import React from "react";
 import { TbFlipHorizontal, TbFlipVertical } from "react-icons/tb";
+import { BsArrowsFullscreen } from "react-icons/Bs";
 import { Toggle } from "@/components/ui/toggle";
-import { useAppDispatch } from "@/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks";
 import { type StageImageItem, updateImage } from "@/store/app.slice";
 import ImageOpacityTool from "@/components/image-editing-tools/image-opacity-tool";
 import { Separator } from "@/components/ui/separator";
+import { CANVAS_PADDING_X, CANVAS_PADDING_Y } from "@/consts/canvas-params";
 
 type Props = {
   selectedItemId: string;
@@ -13,6 +15,9 @@ type Props = {
 
 export function ImageToolbar({ selectedItemId, currentImage }: Props) {
   const dispatch = useAppDispatch();
+
+  const stageParams = useAppSelector((state) => state.app.stage);
+
   const flipImageVerticaly = () => {
     const currentScale = currentImage.scaleY;
     let editOffsetY = currentImage.height;
@@ -40,6 +45,19 @@ export function ImageToolbar({ selectedItemId, currentImage }: Props) {
       }),
     );
   };
+
+  const setAsBackground = () => {
+    dispatch(
+      updateImage({
+        id: selectedItemId,
+        x: CANVAS_PADDING_X,
+        y: CANVAS_PADDING_Y,
+        width: stageParams.width - 2 * CANVAS_PADDING_X,
+        height: stageParams.height - 2 * CANVAS_PADDING_Y,
+      }),
+    );
+  };
+
   return (
     <>
       <Toggle onClick={() => flipImageHorizontaly()}>
@@ -53,6 +71,9 @@ export function ImageToolbar({ selectedItemId, currentImage }: Props) {
         selectedItemId={selectedItemId}
         currentImage={currentImage}
       />
+      <Toggle onClick={() => setAsBackground()}>
+        <BsArrowsFullscreen />
+      </Toggle>
     </>
   );
 }

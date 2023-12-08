@@ -8,19 +8,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RxStack } from "react-icons/rx";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { OrderDirection, updateItemOrder } from "@/store/app.slice";
+import { selectItem, setStageItems } from "@/store/app.slice";
+import { closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import LayerItem from "@/components/layer-item";
 
 export const Layers = () => {
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.app.items);
 
-  const updateImageLayer = (id: string, direction: OrderDirection) => {
-    dispatch(
-      updateItemOrder({
-        id,
-        direction,
-      }),
-    );
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    const oldIndex = items.findIndex((item) => item.id === active.id);
+    const newIndex = items.findIndex((item) => item.id === over?.id);
+    const result = arrayMove(items, oldIndex, newIndex);
+    dispatch(setStageItems(result));
+    dispatch(selectItem(active.id));
   };
 
   return (
@@ -33,26 +40,22 @@ export const Layers = () => {
       <PopoverContent side="right">
         <Card className="p-2">
           <CardHeader>
-            <CardTitle className="text-center">Layer</CardTitle>
+            <CardTitle className="text-center">Layers</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-2">
-            {items.map((item) => (
-              <div key={item.id} className="flex items-center gap-2 ">
-                {item.id}
-                <Button
-                  className="h-full"
-                  onClick={() => updateImageLayer(item.id, OrderDirection.Up)}
-                >
-                  +
-                </Button>
-                <Button
-                  className="h-full"
-                  onClick={() => updateImageLayer(item.id, OrderDirection.Down)}
-                >
-                  -
-                </Button>
-              </div>
-            ))}
+          <CardContent className="grid items-center gap-2 p-2 ">
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={items}
+                strategy={verticalListSortingStrategy}
+              >
+                {items.map((item) => (
+                  <LayerItem item={item} key={item.id} />
+                ))}
+              </SortableContext>
+            </DndContext>
           </CardContent>
         </Card>
       </PopoverContent>

@@ -3,6 +3,8 @@ import ImageInput from "@/components/layout/sidebar/image-input";
 import SizeSelect from "@/components/layout/sidebar/size-select";
 import { BackgroundSelect } from "@/components/layout/sidebar/background-select";
 import { Layers } from "@/components/layout/sidebar/layers";
+import { SelectTemplate } from "@/components/layout/sidebar/select-template";
+import { Switch } from "@/components/ui/switch";
 
 export function Sidebar() {
   return (
@@ -10,7 +12,7 @@ export function Sidebar() {
       <SizeSelect />
       <TextInput />
       <ImageInput />
-      {/*<SelectTemplate />*/}
+      <SelectTemplate />
       <BackgroundSelect />
       <Layers />
     </div>

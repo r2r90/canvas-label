@@ -1,6 +1,7 @@
 import { UserNav } from "./user-nav";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
+import { Switch } from "@/components/ui/switch";
 
 export const Navbar = () => {
   return (
@@ -12,7 +13,7 @@ export const Navbar = () => {
             alt="Logo"
             layout="fill" // required
             objectFit="cover" // change as you like
-            className="rounded-full" // you can use other classes here too
+            className="rounded-full object-cover" // you can use other classes here too
           />
         </div>
         <div className="ml-auto flex items-center space-x-4">

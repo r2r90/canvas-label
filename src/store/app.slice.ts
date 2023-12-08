@@ -13,7 +13,6 @@ export enum StageItemType {
 
 type StageItemCommon = {
   id: string;
-  order: number;
 };
 
 export type StageTextItem = {
@@ -28,7 +27,7 @@ export type StageImageItem = {
 
 type StageItemSpecific = StageTextItem | StageImageItem;
 
-type StageItem = StageItemCommon & StageItemSpecific;
+export type StageItem = StageItemCommon & StageItemSpecific;
 
 const initialState = {
   stage: { width: 500, height: 500, scale: 1, x: 0, y: 0 },
@@ -57,15 +56,13 @@ const defaultImageConfig = {
   scaleY: 1,
 };
 
-export enum OrderDirection {
-  Up = "up",
-  Down = "down",
-}
-
 export const appSlice = createSlice({
   name: "app",
   initialState,
   reducers: {
+    setStageItems: (state, action: PayloadAction<StageItem[]>) => {
+      state.items = action.payload;
+    },
     setStageScale: (
       state,
       action: PayloadAction<{ x: number; y: number; scale: number }>,
@@ -80,7 +77,6 @@ export const appSlice = createSlice({
       state.items.push({
         type: StageItemType.Text,
         id: textId,
-        order: state.items.length + 1,
         params: {
           text: action.payload.initialValue,
 
@@ -102,90 +98,12 @@ export const appSlice = createSlice({
       state.items.push({
         type: StageItemType.Image,
         id: imageId,
-        order: state.items.length + 1,
         params: {
           imageUrl: action.payload.imageUrl,
           width: action.payload.width,
           height: action.payload.height,
           ...defaultImageConfig,
         },
-      });
-    },
-
-    updateImageOrder: (
-      state,
-      action: PayloadAction<{ id: string; direction: OrderDirection }>,
-    ) => {
-      const imageToUpdateIndex = state.items.findIndex(
-        (img) => img.id === action.payload.id,
-      );
-      const imageToUpdate = state.items[imageToUpdateIndex];
-
-      if (!imageToUpdate) return;
-      const isLast = imageToUpdate.order === state.items.length;
-      const isFirst = imageToUpdate.order === 1;
-
-      let newOrder = imageToUpdate.order;
-      if (action.payload.direction === OrderDirection.Up && !isLast) {
-        newOrder = imageToUpdate.order + 1;
-      }
-      if (action.payload.direction === OrderDirection.Down && !isFirst) {
-        newOrder = imageToUpdate.order - 1;
-      }
-
-      state.items[imageToUpdateIndex] = {
-        ...imageToUpdate,
-        order: newOrder,
-      };
-
-      state.items.sort((a, b) => {
-        if (a === b) return 0;
-        if (a < b) return 1;
-        return -1;
-      });
-    },
-
-    updateItemOrder: (
-      state,
-      action: PayloadAction<{ id: string; direction: OrderDirection }>,
-    ) => {
-      const itemToUpdateIndex = state.items.findIndex(
-        (item) => item.id === action.payload.id,
-      );
-      const itemToUpdate = state.items[itemToUpdateIndex];
-
-      if (!itemToUpdate) return;
-      const isLast = itemToUpdate.order === state.items.length;
-      const isFirst = itemToUpdate.order === 1;
-
-      let newOrder = itemToUpdate.order;
-      if (action.payload.direction === OrderDirection.Up && !isLast) {
-        newOrder = itemToUpdate.order + 1;
-      }
-      if (action.payload.direction === OrderDirection.Down && !isFirst) {
-        newOrder = itemToUpdate.order - 1;
-      }
-      const prevItemIndex = state.items.findIndex(
-        (item) => item.order === newOrder,
-      );
-      const prevItem = state.items[prevItemIndex];
-
-      if (!prevItem) return;
-
-      state.items[prevItemIndex] = {
-        ...prevItem,
-        order: itemToUpdate.order,
-      };
-
-      state.items[itemToUpdateIndex] = {
-        ...itemToUpdate,
-        order: newOrder,
-      };
-
-      state.items.sort((a, b) => {
-        if (a === b) return 0;
-        if (a < b) return 1;
-        return -1;
       });
     },
 
@@ -258,15 +176,14 @@ export const appSlice = createSlice({
 });
 
 export const {
-  setStageScale,
   addImage,
   addText,
-  selectItem,
   deselectItem,
   updateText,
   updateImage,
   deleteStageItem,
   updateStage,
   selectBackground,
-  updateItemOrder,
+  setStageItems,
+  selectItem,
 } = appSlice.actions;

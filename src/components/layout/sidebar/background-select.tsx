@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RxLayout } from "react-icons/rx";
 import { Label } from "@/components/ui/label";
-import { useAppDispatch } from "@/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks";
 import { selectBackground } from "@/store/app.slice";
 
 export const BackgroundSelect = () => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
+  const bgColor = useAppSelector((state) => state.app.background);
 
   const handleBackgroundSelect = (color: string) => {
     dispatch(selectBackground(color));
@@ -41,29 +42,16 @@ export const BackgroundSelect = () => {
 
           <CardContent className="grid grid-cols-2 gap-2">
             <div>
-              <div
-                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                onClick={() => handleBackgroundSelect("red")}
-              >
-                Red
-              </div>
-            </div>
-            <div>
-              <Label
-                htmlFor="paypal"
-                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                onClick={() => handleBackgroundSelect("blue")}
-              >
-                Blue
-              </Label>
-            </div>
-            <div>
               <Label
                 htmlFor="apple"
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                onClick={() => handleBackgroundSelect("green")}
               >
-                Green
+                <input
+                  className="m-2 "
+                  type="color"
+                  value={bgColor}
+                  onChange={(e) => handleBackgroundSelect(e.target.value)}
+                />
               </Label>
             </div>
           </CardContent>
