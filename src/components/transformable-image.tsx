@@ -13,6 +13,7 @@ export type TransformableImageProps = {
   isSelected: boolean;
   onSelect: () => void;
   onChange: (newAttrs: TransformableImageConfig) => void;
+  isBlocked: boolean;
 };
 
 export const TransformableImage = ({
@@ -21,6 +22,7 @@ export const TransformableImage = ({
   isSelected,
   onSelect,
   onChange,
+  isBlocked,
 }: TransformableImageProps) => {
   const imageRef = useRef<ElementRef<typeof Image>>(null);
   const trRef = useRef<ElementRef<typeof Transformer>>(null);
@@ -46,8 +48,11 @@ export const TransformableImage = ({
         ref={imageRef}
         {...imageProps}
         image={image}
-        draggable
+        draggable={!isBlocked}
         onDragEnd={(e) => {
+          if (isBlocked) {
+            return;
+          }
           onChange({
             ...imageProps,
             image,

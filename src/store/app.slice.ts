@@ -13,6 +13,7 @@ export enum StageItemType {
 
 type StageItemCommon = {
   id: string;
+  isBlocked: boolean;
 };
 
 export type StageTextItem = {
@@ -77,9 +78,9 @@ export const appSlice = createSlice({
       state.items.push({
         type: StageItemType.Text,
         id: textId,
+        isBlocked: false,
         params: {
           text: action.payload.initialValue,
-
           ...defaultTextConfig,
         },
       });
@@ -98,6 +99,7 @@ export const appSlice = createSlice({
       state.items.push({
         type: StageItemType.Image,
         id: imageId,
+        isBlocked: false,
         params: {
           imageUrl: action.payload.imageUrl,
           width: action.payload.width,
@@ -105,6 +107,21 @@ export const appSlice = createSlice({
           ...defaultImageConfig,
         },
       });
+    },
+    setBlockedItem: (
+      state,
+      action: PayloadAction<{ id: string; blocked: boolean }>,
+    ) => {
+      const itemToUpdate = state.items.find(
+        (item) => item.id === action.payload.id,
+      );
+      if (!itemToUpdate) return;
+
+      if (state.selectedItemId === itemToUpdate.id) {
+        state.selectedItemId = null;
+      }
+
+      itemToUpdate.isBlocked = action.payload.blocked;
     },
 
     selectBackground: (state, action: PayloadAction<string>) => {
@@ -114,6 +131,14 @@ export const appSlice = createSlice({
     },
 
     selectItem: (state, action: PayloadAction<string>) => {
+      const itemToSelect = state.items.find(
+        (item) => item.id === action.payload,
+      );
+
+      if (!itemToSelect || itemToSelect.isBlocked) {
+        return;
+      }
+
       state.selectedItemId = action.payload;
     },
 
@@ -136,7 +161,12 @@ export const appSlice = createSlice({
       const textToUpdateIndex = state.items.findIndex((t) => t.id === id);
       const textToUpdate = state.items[textToUpdateIndex];
 
-      if (!textToUpdate || textToUpdate.type !== StageItemType.Text) return;
+      if (
+        !textToUpdate ||
+        textToUpdate.type !== StageItemType.Text ||
+        textToUpdate.isBlocked
+      )
+        return;
 
       state.items[textToUpdateIndex] = {
         ...textToUpdate,
@@ -155,7 +185,12 @@ export const appSlice = createSlice({
       const imageToUpdateIndex = state.items.findIndex((img) => img.id === id);
       const imageToUpdate = state.items[imageToUpdateIndex];
 
-      if (!imageToUpdate || imageToUpdate.type !== StageItemType.Image) return;
+      if (
+        !imageToUpdate ||
+        imageToUpdate.type !== StageItemType.Image ||
+        imageToUpdate.isBlocked
+      )
+        return;
 
       (state.items[imageToUpdateIndex] as WritableDraft<StageImageItem>) = {
         ...imageToUpdate,
@@ -186,4 +221,5 @@ export const {
   selectBackground,
   setStageItems,
   selectItem,
+  setBlockedItem,
 } = appSlice.actions;

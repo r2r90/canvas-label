@@ -38,6 +38,7 @@ export type TransformableTextProps = {
   id: string;
   isEditing?: boolean;
   onEditChange?: (isEditing: boolean) => void;
+  isBlocked: boolean;
 };
 
 const TransformableText = ({
@@ -48,6 +49,7 @@ const TransformableText = ({
   id,
   isEditing,
   onEditChange,
+  isBlocked,
 }: TransformableTextProps) => {
   console.log(textProps);
   const [value, setText] = useState<string | undefined>("");
@@ -70,6 +72,7 @@ const TransformableText = ({
   };
 
   const handleDblClick = () => {
+    if (isBlocked) return;
     setText(text);
     onEditChange?.(true);
   };
@@ -121,8 +124,9 @@ const TransformableText = ({
         align={"center"}
         {...textProps}
         text={text}
-        draggable
+        draggable={!isBlocked}
         onDragEnd={(e) => {
+          if (isBlocked) return;
           onChange({
             ...textProps,
             text,

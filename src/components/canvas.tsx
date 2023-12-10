@@ -109,6 +109,7 @@ const Canvas = () => {
                     }}
                     imageProps={item.params}
                     key={item.id}
+                    isBlocked={item.isBlocked}
                   />
                 );
               }
@@ -116,6 +117,7 @@ const Canvas = () => {
                 return (
                   <TransformableText
                     isEditing={isEditing}
+                    isBlocked={item.isBlocked}
                     onEditChange={toggleEdit}
                     onSelect={() => selectItem(item.id)}
                     isSelected={item.id === selectedItemId}
