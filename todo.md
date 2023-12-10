@@ -9,4 +9,12 @@
 - Template properties ( assets )
 - Canvas sizes
 - what to add or change?
-- 
+
+
+
+
+todo with Andrei 
+
+- lines in canvas with css 
+- error correction
+- questions about legacy type

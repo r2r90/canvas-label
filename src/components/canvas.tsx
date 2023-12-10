@@ -14,6 +14,7 @@ import { Toolbar } from "@/components/toolbar";
 import TransformableText from "@/components/transformable-text";
 import LayerBorder from "@/components/layer-border";
 import { CANVAS_PADDING_X, CANVAS_PADDING_Y } from "@/consts/canvas-params";
+import Legacy from "@/components/layout/sidebar/legacy";
 
 const Canvas = () => {
   const dispatch = useAppDispatch();
@@ -129,7 +130,7 @@ const Canvas = () => {
               }
             })}
           </Layer>
-          {/*<Legales />*/}
+          <Legacy stageParams={stage} />
 
           <LayerBorder />
         </Stage>

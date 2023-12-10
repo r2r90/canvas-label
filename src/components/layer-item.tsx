@@ -3,6 +3,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { type StageItem, StageItemType } from "@/store/app.slice";
 import { useAppDispatch } from "@/hooks";
+import { Button } from "@/components/ui/button";
+import { HiOutlineLockClosed, HiOutlineLockOpen } from "react-icons/hi2";
 
 export default function LayerItem({ item }: { item: StageItem }) {
   const dispatch = useAppDispatch();
@@ -23,6 +25,8 @@ export default function LayerItem({ item }: { item: StageItem }) {
       {...listeners}
       className="m-2 flex items-center justify-between rounded-md border p-2 text-black"
     >
+      <span className="">{item.type}</span>
+
       {item.type === StageItemType.Text ? (
         item.params.text < 5 ? (
           item.params.text
@@ -36,7 +40,10 @@ export default function LayerItem({ item }: { item: StageItem }) {
           src={item.params.imageUrl}
         />
       )}
-      <span className="">{item.type}</span>
+      <Button>
+        <HiOutlineLockClosed />
+        <HiOutlineLockOpen />
+      </Button>
     </div>
   );
 }
