@@ -5,6 +5,8 @@ import { type AppType } from "next/app";
 import { api } from "@/utils/api";
 
 import "@/styles/globals.css";
+import "../index.css";
+
 import { Layout } from "@/components/layout/layout";
 import { Provider } from "react-redux";
 import { store } from "@/store/store";

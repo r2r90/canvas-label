@@ -1,6 +1,6 @@
 import { type ImageConfig } from "konva/lib/shapes/Image";
-import { useRef, useEffect, type ElementRef } from "react";
-import { Transformer, Image } from "react-konva";
+import { type ElementRef, useEffect, useRef } from "react";
+import { Image, Transformer } from "react-konva";
 import useImage from "use-image";
 
 type TransformableImageConfig = Omit<ImageConfig, "image"> & {
@@ -37,10 +37,26 @@ export const TransformableImage = ({
       trRef.current?.getLayer()?.batchDraw();
     }
   }, [isSelected]);
-
   return (
     <>
       <Image
+        onDragMove={(e) => {
+          console.log(e);
+          const positionX = e.target.x() + e.target.width() / 2;
+          const positionY = e.target.y() + e.target.height() / 2;
+          const canvasXCenter = (e.target.getStage()?.width() ?? 0) / 2;
+          const canvasYCenter = (e.target.getStage()?.height() ?? 0) / 2;
+          const isInTheXCenter =
+            Math.abs(Math.round(canvasXCenter) - Math.round(positionX)) <= 5;
+          const isInTheYCenter =
+            Math.abs(Math.round(canvasYCenter) - Math.round(positionY)) <= 5;
+
+          document.body.classList.toggle("show-vertical-line", isInTheXCenter);
+          document.body.classList.toggle(
+            "show-horizontal-line",
+            isInTheYCenter,
+          );
+        }}
         id={id}
         alt={"canvas image"}
         onClick={onSelect}
@@ -53,10 +69,16 @@ export const TransformableImage = ({
           if (isBlocked) {
             return;
           }
+          const positionX = e.target.x() + e.target.width() / 2;
+          const canvasXCenter = (e.target.getStage()?.width() ?? 0) / 2;
+          const isInTheCenter =
+            Math.abs(Math.round(canvasXCenter) - Math.round(positionX)) <= 5;
           onChange({
             ...imageProps,
             image,
-            x: e.target.x(),
+            x: isInTheCenter
+              ? canvasXCenter - e.target.width() / 2
+              : e.target.x(),
             y: e.target.y(),
           });
         }}
@@ -80,6 +102,8 @@ export const TransformableImage = ({
             height: Math.max(node.height() * scaleY),
           });
         }}
+        x={imageProps.x}
+        y={imageProps.y}
       />
       {isSelected && (
         <Transformer

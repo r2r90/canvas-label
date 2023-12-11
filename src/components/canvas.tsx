@@ -60,7 +60,9 @@ const Canvas = () => {
     <div className="relative flex h-full w-full flex-col items-center">
       <Toolbar />
       <div
-        className={"flex h-full w-full items-center justify-center"}
+        className={
+          "vertical-line horizontal-line flex h-full w-full items-center justify-center"
+        }
         onClick={(e) => {
           if (e.target !== e.currentTarget) {
             return;

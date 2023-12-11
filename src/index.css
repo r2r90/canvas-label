@@ -1,0 +1,15 @@
+.show-horizontal-line .horizontal-line::before {
+    content: '';
+    border-bottom: 1px solid red;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    z-index:9999
+}
+.show-vertical-line .vertical-line::after {
+    content: '';
+    border-right: 1px dotted #8a8888;
+    height: 100%;
+    position: absolute;
+    left: 50%
+}

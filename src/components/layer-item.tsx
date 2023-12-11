@@ -6,14 +6,15 @@ import {
   type StageItem,
   StageItemType,
 } from "@/store/app.slice";
-import { useAppDispatch } from "@/hooks";
-import { Button } from "@/components/ui/button";
-import { HiOutlineLockClosed, HiOutlineLockOpen } from "react-icons/hi2";
+import { useAppDispatch, useAppSelector } from "@/hooks";
 import { IconButton } from "@radix-ui/themes";
-import { GripVertical } from "lucide-react";
+import { Eye, GripVertical, Lock, Trash2, Unlock } from "lucide-react";
+import { DeleteShapeButton } from "@/components/delete-shape-button";
+import VisibleShapeToggle from "@/components/visible-shape-toggle";
 
 export default function LayerItem({ item }: { item: StageItem }) {
   const dispatch = useAppDispatch();
+  const selectedItemId = useAppSelector((state) => state.app.selectedItemId);
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: item.id,
@@ -33,12 +34,12 @@ export default function LayerItem({ item }: { item: StageItem }) {
       style={style}
       ref={setNodeRef}
       {...attributes}
-      className="m-2 flex items-center justify-between rounded-md border p-2 text-black"
+      className="flex items-center justify-between rounded-md border bg-yellow-50 p-2 text-black"
     >
       <IconButton {...listeners}>
-        <GripVertical />
+        <GripVertical size={18} />
       </IconButton>
-      <span className="">{item.type}</span>
+      <span className="text-sm">{item.type}</span>
 
       {item.type === StageItemType.Text ? (
         item.params.text < 5 ? (
@@ -53,9 +54,14 @@ export default function LayerItem({ item }: { item: StageItem }) {
           src={item.params.imageUrl}
         />
       )}
-      <Button onClick={handleBlockItemClicked}>
-        {item.isBlocked ? <HiOutlineLockClosed /> : <HiOutlineLockOpen />}
-      </Button>
+
+      <DeleteShapeButton selectedItemId={selectedItemId} />
+
+      <VisibleShapeToggle />
+
+      <span onClick={() => handleBlockItemClicked()}>
+        {item.isBlocked ? <Lock size={18} /> : <Unlock size={18} />}
+      </span>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { deleteStageItem } from "@/store/app.slice";
 import { useAppDispatch } from "@/hooks";
-import { BsTrash3 } from "react-icons/bs";
+import { IconButton } from "@radix-ui/themes";
+import { Trash2 } from "lucide-react";
 
 type Props = {
   selectedItemId: string;
@@ -14,12 +14,8 @@ export const DeleteShapeButton = ({ selectedItemId }: Props) => {
     dispatch(deleteStageItem(selectedItemId));
   };
   return (
-    <Button
-      variant="destructive"
-      color="cyan"
-      onClick={() => deleteTextHandler(selectedItemId)}
-    >
-      <BsTrash3 />
-    </Button>
+    <IconButton onClick={() => deleteTextHandler(selectedItemId)}>
+      <Trash2 size={18} />
+    </IconButton>
   );
 };
