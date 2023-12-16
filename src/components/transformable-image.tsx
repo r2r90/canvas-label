@@ -41,21 +41,11 @@ export const TransformableImage = ({
     <>
       <Image
         onDragMove={(e) => {
-          console.log(e);
-          const positionX = e.target.x() + e.target.width() / 2;
-          const positionY = e.target.y() + e.target.height() / 2;
-          const canvasXCenter = (e.target.getStage()?.width() ?? 0) / 2;
-          const canvasYCenter = (e.target.getStage()?.height() ?? 0) / 2;
-          const isInTheXCenter =
-            Math.abs(Math.round(canvasXCenter) - Math.round(positionX)) <= 5;
-          const isInTheYCenter =
-            Math.abs(Math.round(canvasYCenter) - Math.round(positionY)) <= 5;
+          if (isBlocked) {
+            return;
+          }
 
-          document.body.classList.toggle("show-vertical-line", isInTheXCenter);
-          document.body.classList.toggle(
-            "show-horizontal-line",
-            isInTheYCenter,
-          );
+          imageProps.onDragMove(e);
         }}
         id={id}
         alt={"canvas image"}
@@ -69,18 +59,7 @@ export const TransformableImage = ({
           if (isBlocked) {
             return;
           }
-          const positionX = e.target.x() + e.target.width() / 2;
-          const canvasXCenter = (e.target.getStage()?.width() ?? 0) / 2;
-          const isInTheCenter =
-            Math.abs(Math.round(canvasXCenter) - Math.round(positionX)) <= 5;
-          onChange({
-            ...imageProps,
-            image,
-            x: isInTheCenter
-              ? canvasXCenter - e.target.width() / 2
-              : e.target.x(),
-            y: e.target.y(),
-          });
+          imageProps.onDragEnd?.(e);
         }}
         onTransformEnd={() => {
           const node = imageRef.current;
