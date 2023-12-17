@@ -19,8 +19,12 @@ import LayerItem from "@/components/layer-item";
 
 export const Layers = () => {
   const dispatch = useAppDispatch();
-  const items = useAppSelector((state) => state.app.items);
 
+  const currentStep = useAppSelector((state) => state.app.currentStep);
+  const items = useAppSelector(
+    (state) => state.app.history[currentStep]?.items,
+  );
+  if (!items) return;
   const handleDragEnd = (e: DragEndEvent) => {
     const { active, over } = e;
     const oldIndex = items.findIndex((item) => item.id === active.id);

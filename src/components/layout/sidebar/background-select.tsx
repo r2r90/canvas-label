@@ -14,15 +14,12 @@ import { selectBackground } from "@/store/app.slice";
 export const BackgroundSelect = () => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
-  const bgColor = useAppSelector((state) => state.app.background);
+  const bgColor = useAppSelector((state) => state.app.backgroundColor);
 
   const handleBackgroundSelect = (color: string) => {
     dispatch(selectBackground(color));
   };
 
-  const handleSizeSelect = () => {
-    setOpen(false);
-  };
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -49,7 +46,7 @@ export const BackgroundSelect = () => {
                 <input
                   className="m-2 "
                   type="color"
-                  value={bgColor}
+                  value={bgColor ?? undefined}
                   onChange={(e) => handleBackgroundSelect(e.target.value)}
                 />
               </Label>

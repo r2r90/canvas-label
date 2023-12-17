@@ -8,10 +8,16 @@ import { Separator } from "@/components/ui/separator";
 
 export const Toolbar = () => {
   const dispatch = useAppDispatch();
-  const selectedItemId = useAppSelector((state) => state.app.selectedItemId);
-  const items = useAppSelector((state) => state.app.items);
+  const currentStep = useAppSelector((state) => state.app.currentStep);
 
-  const currentItem = items.find((t) => t.id === selectedItemId);
+  const selectedItemId = useAppSelector(
+    (state) => state.app.history[currentStep]?.selectedItemId,
+  );
+  const items = useAppSelector(
+    (state) => state.app.history[currentStep]?.items,
+  );
+
+  const currentItem = items?.find((t) => t.id === selectedItemId);
 
   if (!currentItem || !selectedItemId) return null;
 

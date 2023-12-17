@@ -11,7 +11,12 @@ import {
 import { useAppSelector } from "@/hooks";
 
 export default function LayerBorder() {
-  const stage = useAppSelector((state) => state.app.stage);
+  const currentStep = useAppSelector((state) => state.app.currentStep);
+
+  const stage = useAppSelector(
+    (state) => state.app.history[currentStep]?.stage,
+  );
+  if (!stage) return null;
   return (
     <Layer>
       <Line

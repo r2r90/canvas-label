@@ -36,14 +36,24 @@ const GUIDELINE_OFFSET = 5;
 
 const Canvas = () => {
   const dispatch = useAppDispatch();
-  const stage = useAppSelector((state) => state.app.stage);
+  const currentStep = useAppSelector((state) => state.app.currentStep);
+
+  const stage = useAppSelector(
+    (state) => state.app.history[currentStep]?.stage,
+  );
   const stageRef = useRef<Konva.Stage>(null);
   const layerRef = useRef<Konva.Layer>(null);
-  const selectedItemId = useAppSelector((state) => state.app.selectedItemId);
+  const selectedItemId = useAppSelector(
+    (state) => state.app.history[currentStep]?.selectedItemId,
+  );
   const selectItem = (id: string) => dispatch(appSlice.actions.selectItem(id));
-  const items = useAppSelector((state) => state.app.items);
+  const items = useAppSelector(
+    (state) => state.app.history[currentStep]?.items,
+  );
 
-  const backgroundRect = useAppSelector((state) => state.app.background);
+  const backgroundRect = useAppSelector(
+    (state) => state.app.history[currentStep]?.backgroundColor,
+  );
   const backgroundId = "background";
   const deselectHandler = (
     e: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>,
@@ -337,6 +347,7 @@ const Canvas = () => {
     layer?.find(".guid-line").forEach((l) => l.destroy());
   };
 
+  if (!stage) return null;
   return (
     <div className="relative flex h-full w-full flex-col items-center">
       <Toolbar />
@@ -368,7 +379,7 @@ const Canvas = () => {
               <Rect
                 width={stage.width}
                 height={stage.height}
-                fill={backgroundRect.fill}
+                fill={backgroundRect}
                 onTouchStart={deselectHandler}
                 onClick={deselectHandler}
                 id={backgroundId}
@@ -382,7 +393,7 @@ const Canvas = () => {
             clipHeight={stage.height - 2 * CANVAS_PADDING_Y}
             ref={layerRef}
           >
-            {items.toReversed().map((item) => {
+            {items?.toReversed().map((item) => {
               if (item.type === StageItemType.Image) {
                 return (
                   <TransformableImage

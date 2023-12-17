@@ -1,9 +1,8 @@
 import type { TransformableImageProps } from "@/components/transformable-image";
 import type { TransformableTextProps } from "@/components/transformable-text";
-import type { PayloadAction } from "@reduxjs/toolkit";
-import { createSlice } from "@reduxjs/toolkit";
+import type { AnyAction, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, current } from "@reduxjs/toolkit";
 import { v1 } from "uuid";
-import { type RectConfig } from "konva/lib/shapes/Rect";
 import { type WritableDraft } from "immer/src/types/types-external";
 
 export enum StageItemType {
@@ -31,10 +30,15 @@ type StageItemSpecific = StageTextItem | StageImageItem;
 export type StageItem = StageItemCommon & StageItemSpecific;
 
 const initialState = {
-  stage: { width: 500, height: 500, scale: 1, x: 0, y: 0 },
-  items: [] as StageItem[],
-  selectedItemId: null as string | null,
-  background: null as RectConfig | null,
+  history: [
+    {
+      stage: { width: 500, height: 500, scale: 1, x: 0, y: 0 },
+      items: [] as StageItem[],
+      selectedItemId: null as string | null,
+      backgroundColor: null as string | null,
+    },
+  ],
+  currentStep: 0,
 };
 
 const defaultTextConfig = {
@@ -57,156 +61,260 @@ const defaultImageConfig = {
   scaleY: 1,
 };
 
+const addNewItemToHistory =
+  (
+    callback: (
+      state: WritableDraft<typeof initialState>,
+      action: any,
+      currentHistoryEntry: WritableDraft<
+        (typeof initialState)["history"][number]
+      >,
+    ) => void,
+  ) =>
+  (state: WritableDraft<typeof initialState>, action: any) => {
+    state.history.slice(0, state.currentStep + 1);
+    const currentHistoryEntry = state.history[state.currentStep];
+    if (!currentHistoryEntry) {
+      return;
+    }
+    state.currentStep = state.history.length;
+    callback(state, action, currentHistoryEntry);
+  };
+
 export const appSlice = createSlice({
   name: "app",
   initialState,
   reducers: {
-    setStageItems: (state, action: PayloadAction<StageItem[]>) => {
-      state.items = action.payload;
-    },
-    setStageScale: (
-      state,
-      action: PayloadAction<{ x: number; y: number; scale: number }>,
-    ) => {
-      state.stage = {
-        ...state.stage,
-        ...action.payload,
-      };
-    },
-    addText: (state, action: PayloadAction<{ initialValue: string }>) => {
-      const textId = v1();
-      state.items.push({
-        type: StageItemType.Text,
-        id: textId,
-        isBlocked: false,
-        params: {
-          text: action.payload.initialValue,
-          ...defaultTextConfig,
-        },
-      });
-    },
-    addImage: (
-      state,
-      action: PayloadAction<{
-        imageUrl: string;
-        width: number;
-        height: number;
-      }>,
-    ) => {
-      const file = action.payload;
-      if (!file) return;
-      const imageId = v1();
-      state.items.push({
-        type: StageItemType.Image,
-        id: imageId,
-        isBlocked: false,
-        params: {
-          imageUrl: action.payload.imageUrl,
-          width: action.payload.width,
-          height: action.payload.height,
-          ...defaultImageConfig,
-        },
-      });
-    },
-    setBlockedItem: (
-      state,
-      action: PayloadAction<{ id: string; blocked: boolean }>,
-    ) => {
-      const itemToUpdate = state.items.find(
-        (item) => item.id === action.payload.id,
-      );
-      if (!itemToUpdate) return;
-
-      if (state.selectedItemId === itemToUpdate.id) {
-        state.selectedItemId = null;
-      }
-
-      itemToUpdate.isBlocked = action.payload.blocked;
-    },
-
-    selectBackground: (state, action: PayloadAction<string>) => {
-      state.background = {
-        fill: action.payload,
-      };
-    },
-
-    selectItem: (state, action: PayloadAction<string>) => {
-      const itemToSelect = state.items.find(
-        (item) => item.id === action.payload,
-      );
-
-      if (!itemToSelect || itemToSelect.isBlocked) {
+    goBack: (state) => {
+      if (state.currentStep === 0) {
         return;
       }
-
-      state.selectedItemId = action.payload;
+      state.currentStep = state.currentStep - 1;
     },
-
-    deselectItem: (state) => {
-      state.selectedItemId = null;
-    },
-
-    updateStage: (
-      state,
-      action: PayloadAction<{ width?: number; height?: number }>,
-    ) => {
-      state.stage = { ...state.stage, ...action.payload };
-    },
-
-    updateText: (
-      state,
-      action: PayloadAction<{ id: string } & Partial<StageTextItem["params"]>>,
-    ) => {
-      const { id, ...params } = action.payload;
-      const textToUpdateIndex = state.items.findIndex((t) => t.id === id);
-      const textToUpdate = state.items[textToUpdateIndex];
-
-      if (
-        !textToUpdate ||
-        textToUpdate.type !== StageItemType.Text ||
-        textToUpdate.isBlocked
-      )
+    goForward: (state) => {
+      console.log(current(state));
+      if (state.history.length - 1 === state.currentStep) {
         return;
-
-      state.items[textToUpdateIndex] = {
-        ...textToUpdate,
-        params: {
-          ...textToUpdate.params,
-          ...params,
-        },
-      };
+      }
+      state.currentStep = state.currentStep + 1;
     },
+    //+
+    setStageItems: addNewItemToHistory(
+      (state, action: PayloadAction<StageItem[]>, currentHistoryEntry) => {
+        const newHistoryEntry = {
+          ...currentHistoryEntry,
+          items: action.payload,
+        };
+        state.history.push(newHistoryEntry);
+      },
+    ),
+    // +
+    addText: addNewItemToHistory(
+      (
+        state,
+        action: PayloadAction<{ initialValue: string }>,
+        currentHistoryEntry,
+      ) => {
+        const newEntry = JSON.parse(
+          JSON.stringify(currentHistoryEntry),
+        ) as typeof currentHistoryEntry;
+        const textId = v1();
+        const newText = {
+          type: StageItemType.Text,
+          id: textId,
+          isBlocked: false,
+          params: {
+            text: action.payload.initialValue,
+            ...defaultTextConfig,
+          },
+        } as const;
+        newEntry.items = [...newEntry.items, newText];
+        state.history.push(newEntry);
+      },
+    ),
+    // +
+    addImage: addNewItemToHistory(
+      (
+        state,
+        action: PayloadAction<{
+          imageUrl: string;
+          width: number;
+          height: number;
+        }>,
+        currentHistoryEntry,
+      ) => {
+        const file = action.payload;
+        if (!file) return;
+        const imageId = v1();
+        const newImage = {
+          type: StageItemType.Image,
+          id: imageId,
+          isBlocked: false,
+          params: {
+            imageUrl: action.payload.imageUrl,
+            width: action.payload.width,
+            height: action.payload.height,
+            ...defaultImageConfig,
+          },
+        } as const;
+        const newHistoryEntry = {
+          ...currentHistoryEntry,
+          items: [...currentHistoryEntry.items, newImage],
+        };
+        state.history.push(newHistoryEntry);
+      },
+    ),
+    // +
+    setBlockedItem: addNewItemToHistory(
+      (
+        state,
+        action: PayloadAction<{ id: string; blocked: boolean }>,
+        currentHistoryEntry,
+      ) => {
+        const newEntry = JSON.parse(
+          JSON.stringify(currentHistoryEntry),
+        ) as typeof currentHistoryEntry;
 
-    updateImage: (
-      state,
-      action: PayloadAction<{ id: string } & Partial<StageImageItem["params"]>>,
-    ) => {
-      const { id, ...params } = action.payload;
-      const imageToUpdateIndex = state.items.findIndex((img) => img.id === id);
-      const imageToUpdate = state.items[imageToUpdateIndex];
+        const itemToUpdate = newEntry.items.find(
+          (item) => item.id === action.payload.id,
+        );
+        if (!itemToUpdate) return;
+        if (newEntry.selectedItemId === itemToUpdate.id) {
+          newEntry.selectedItemId = null;
+        }
+        itemToUpdate.isBlocked = action.payload.blocked;
+        state.history.push(newEntry);
+      },
+    ),
+    // +
+    selectBackground: addNewItemToHistory(
+      (state, action: PayloadAction<string>, currentHistoryEntry) => {
+        state.history.push({
+          ...currentHistoryEntry,
+          backgroundColor: action.payload,
+        });
+      },
+    ),
+    // -
+    selectItem: addNewItemToHistory(
+      (state, action: PayloadAction<string>, currentHistoryEntry) => {
+        const itemToSelect = currentHistoryEntry.items.find(
+          (item) => item.id === action.payload,
+        );
 
-      if (
-        !imageToUpdate ||
-        imageToUpdate.type !== StageItemType.Image ||
-        imageToUpdate.isBlocked
-      )
-        return;
+        if (!itemToSelect || itemToSelect.isBlocked) {
+          return;
+        }
+        state.history.push({
+          ...currentHistoryEntry,
+          selectedItemId: action.payload,
+        });
+      },
+    ),
+    // -
+    deselectItem: addNewItemToHistory((state, _action, currentHistoryEntry) => {
+      state.history.push({
+        ...currentHistoryEntry,
+        selectedItemId: null,
+      });
+    }),
+    // -
+    updateStage: addNewItemToHistory(
+      (
+        state,
+        action: PayloadAction<{ width?: number; height?: number }>,
+        currentHistoryEntry,
+      ) => {
+        currentHistoryEntry.stage = {
+          ...currentHistoryEntry.stage,
+          ...action.payload,
+        };
+      },
+    ),
+    // +
+    updateText: addNewItemToHistory(
+      (
+        state,
+        action: PayloadAction<
+          { id: string } & Partial<StageTextItem["params"]>
+        >,
+        currentHistoryEntry,
+      ) => {
+        const { id, ...params } = action.payload;
+        const newEntry = JSON.parse(
+          JSON.stringify(currentHistoryEntry),
+        ) as typeof currentHistoryEntry;
+        const textToUpdateIndex = newEntry.items.findIndex((t) => t.id === id);
+        const textToUpdate = newEntry.items[textToUpdateIndex];
 
-      (state.items[imageToUpdateIndex] as WritableDraft<StageImageItem>) = {
-        ...imageToUpdate,
-        params: {
-          ...imageToUpdate.params,
-          ...params,
-        },
-      };
-    },
+        if (
+          !textToUpdate ||
+          textToUpdate.type !== StageItemType.Text ||
+          textToUpdate.isBlocked
+        )
+          return;
 
-    deleteStageItem: (state, action: PayloadAction<string>) => {
-      return {
-        ...state,
-        items: state.items.filter((item) => item.id !== action.payload),
-      };
-    },
+        newEntry.items[textToUpdateIndex] = {
+          ...textToUpdate,
+          params: {
+            ...textToUpdate.params,
+            ...params,
+          },
+        };
+        state.history.push(newEntry);
+      },
+    ),
+    // +
+    updateImage: addNewItemToHistory(
+      (
+        state,
+        action: PayloadAction<
+          { id: string } & Partial<StageImageItem["params"]>
+        >,
+        currentHistoryEntry,
+      ) => {
+        const { id, ...params } = action.payload;
+        const newEntry = JSON.parse(
+          JSON.stringify(currentHistoryEntry),
+        ) as typeof currentHistoryEntry;
+        const imageToUpdateIndex = newEntry.items.findIndex(
+          (img) => img.id === id,
+        );
+        const imageToUpdate = newEntry.items[imageToUpdateIndex];
+
+        if (
+          !imageToUpdate ||
+          imageToUpdate.type !== StageItemType.Image ||
+          imageToUpdate.isBlocked
+        )
+          return;
+
+        newEntry.items = newEntry.items.map((item, index) => {
+          if (index !== imageToUpdateIndex) return item;
+          return {
+            ...imageToUpdate,
+            params: {
+              ...imageToUpdate.params,
+              ...params,
+            },
+          };
+        });
+
+        state.history.push(newEntry);
+      },
+    ),
+    // +
+    deleteStageItem: addNewItemToHistory(
+      (state, action: PayloadAction<string>, currentHistoryEntry) => {
+        const newEntry = {
+          ...currentHistoryEntry,
+          items: currentHistoryEntry.items.filter(
+            (item) => item.id !== action.payload,
+          ),
+        };
+        state.history.push(newEntry);
+      },
+    ),
   },
 });
 
@@ -222,4 +330,6 @@ export const {
   setStageItems,
   selectItem,
   setBlockedItem,
+  goBack,
+  goForward,
 } = appSlice.actions;
