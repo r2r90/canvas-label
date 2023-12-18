@@ -1,11 +1,11 @@
 import React from "react";
-import { Save } from "@/components/Test/navbar/Save";
-import { Preview } from "@/components/Test/navbar/Preview";
-import { SelectVigneron } from "@/components/Test/navbar/select-vigneron";
-import { presets } from "@/components/Test/navbar/list-de-vignerons";
+import { Save } from "@/components/layout/header/Save";
+import { Preview } from "@/components/layout/header/Preview";
+import { SelectVigneron } from "@/components/layout/header/select-vigneron";
+import { presets } from "@/components/layout/header/list-de-vignerons";
 import { UserNav } from "@/components/layout/user-nav";
 
-export default function Navbar() {
+export default function Header() {
   return (
     <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
       <h2 className="text-lg font-semibold">Vitiquette</h2>

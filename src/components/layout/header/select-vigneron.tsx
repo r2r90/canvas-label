@@ -4,9 +4,6 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { type PopoverProps } from "@radix-ui/react-popover";
-
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -19,8 +16,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
 import { type Preset } from "./list-de-vignerons";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface PresetSelectorProps extends PopoverProps {
   presets: Preset[];

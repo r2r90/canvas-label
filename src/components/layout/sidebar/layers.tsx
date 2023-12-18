@@ -19,7 +19,6 @@ import LayerItem from "@/components/layer-item";
 
 export const Layers = () => {
   const dispatch = useAppDispatch();
-
   const currentStep = useAppSelector((state) => state.app.currentStep);
   const items = useAppSelector(
     (state) => state.app.history[currentStep]?.items,
