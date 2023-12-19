@@ -1,19 +1,22 @@
-import React, { type ElementRef, useEffect, useRef, useState } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import React, {
+  ChangeEvent,
+  type ElementRef,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
 import * as process from "process";
-import { LuLayoutTemplate } from "react-icons/lu";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
+import { addImage } from "@/store/app.slice";
 
-export const ImageGallery = () => {
-  const [open, setOpen] = useState<boolean>(false);
+type Props = {
+  open: boolean;
+};
+
+export const ImageGallery = ({ open }: Props) => {
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -85,23 +88,59 @@ export const ImageGallery = () => {
         return oldPage + 1;
       });
     };
-
+    const handleImageUploaded = () => {
+      if (!file) return;
+      const img = document.createElement("img");
+      const imageUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        dispatch(addImage({ imageUrl, width: img.width, height: img.height }));
+        img.remove();
+      };
+      img.src = imageUrl;
+      img.style.cssText = "display: none;";
+      document.body.appendChild(img);
+    };
     scrollAreaRef.current?.addEventListener("scroll", handler);
     return () => ref?.removeEventListener("scroll", handler);
   }, [isLoading, open]);
 
+  const handleImageAdd = (e) => {
+    console.log(e.target);
+  };
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          onClick={() => setOpen(true)}
-          variant="outline"
-          className="text-xl"
-        >
-          <LuLayoutTemplate />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent side="right" className="mt-4"></PopoverContent>
-    </Popover>
+    <Card className="min-h-full p-3">
+      <CardHeader className="mb-2 p-2 text-center">
+        <CardTitle>Template</CardTitle>
+      </CardHeader>
+
+      <Input
+        type="text"
+        placeholder="Search Images"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+
+      <div
+        className="mt-3 max-h-64 w-full grid-cols-2  justify-center overflow-auto"
+        ref={scrollAreaRef}
+      >
+        {photos?.map((p, i) => (
+          <div
+            key={i}
+            onClick={(e) => handleImageAdd(e)}
+            className="rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+          >
+            <Image
+              key={p.i}
+              src={p.urls.small}
+              alt={"image"}
+              height={100}
+              width={100}
+            />
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 };

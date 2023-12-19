@@ -8,7 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { addText } from "@/store/app.slice";
 import { useAppDispatch } from "@/hooks";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { RxText } from "react-icons/rx";
 
 export function TextInput() {
@@ -51,6 +57,9 @@ export function TextInput() {
             </Button>
             <Button onClick={handleTextAdd}>Submit</Button>
           </CardFooter>
+          <CardDescription>
+            Téléchargez votre image et ajoutez-la à votre étiquette.
+          </CardDescription>
         </Card>
       </PopoverContent>
     </Popover>
