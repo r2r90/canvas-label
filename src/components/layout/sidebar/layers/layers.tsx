@@ -28,9 +28,6 @@ export const Layers = () => {
 
   return (
     <Card className="p-2">
-      <CardHeader>
-        <CardTitle className="text-center">Layers</CardTitle>
-      </CardHeader>
       <CardContent className="grid items-center gap-2 p-2 ">
         <DndContext
           collisionDetection={closestCenter}

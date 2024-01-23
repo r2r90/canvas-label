@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "labels-app",
+  "builds": [
+    {
+      "src": "src/pages/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "src/pages/index.ts"
+    }
+  ]
+}

@@ -3,6 +3,8 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch } from "@/hooks";
 import { updateStage } from "@/store/app.slice";
+import { ModelSelector } from "@/components/layout/sidebar/stage-settings/stage-size-selector/model-selector";
+import { models, types } from "./stage-size-selector/models";
 
 export const StageSize = () => {
   const dispatch = useAppDispatch();
@@ -15,7 +17,7 @@ export const StageSize = () => {
   };
   return (
     <Card className="p-3">
-      <CardHeader>
+      {/*<CardHeader>
         <CardTitle>{`Sélectionnez la taille d'étiquette`}</CardTitle>
       </CardHeader>
 
@@ -29,14 +31,9 @@ export const StageSize = () => {
         <Button onClick={() => handleStageSizeSelect(410, 289)}>
           Grand Format
         </Button>
-      </div>
+      </div>*/}
 
-      {/*<CardFooter className="mt-8 justify-between">*/}
-      {/*  <Button variant="ghost" onClick={() => setOpen(false)}>*/}
-      {/*    Cancel*/}
-      {/*  </Button>*/}
-      {/*  <Button onClick={handleSizeSelect}>Submit</Button>*/}
-      {/*</CardFooter>*/}
+      <ModelSelector types={types} models={models} />
     </Card>
   );
 };

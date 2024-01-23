@@ -4,6 +4,7 @@ import type { AnyAction, PayloadAction } from "@reduxjs/toolkit";
 import { createSlice, current } from "@reduxjs/toolkit";
 import { v1 } from "uuid";
 import { type WritableDraft } from "immer/src/types/types-external";
+import { CANVAS_PADDING_X, CANVAS_PADDING_Y } from "@/consts/canvas-params";
 
 export enum StageItemType {
   Text = "text",
@@ -54,6 +55,16 @@ const defaultTextConfig = {
 const defaultImageConfig = {
   x: 50,
   y: 50,
+  opacity: 1,
+  offsetX: 0,
+  offsetY: 0,
+  scaleX: 1,
+  scaleY: 1,
+};
+
+const defaultBackgroundImageConfig = {
+  x: 0,
+  y: 0,
   opacity: 1,
   offsetX: 0,
   offsetY: 0,
@@ -195,6 +206,36 @@ export const appSlice = createSlice({
         });
       },
     ),
+
+    setBackgroundImage: addNewItemToHistory(
+      (
+        state,
+        action: PayloadAction<{
+          imageUrl: string;
+        }>,
+        currentHistoryEntry,
+      ) => {
+        const image = action.payload;
+        if (!image) return;
+        const imageId = v1();
+        const newImage = {
+          type: StageItemType.Image,
+          id: imageId,
+          isBlocked: false,
+          params: {
+            imageUrl: action.payload.imageUrl,
+            width: state.history[0]?.stage.width,
+            height: state.history[0]?.stage.height,
+            ...defaultBackgroundImageConfig,
+          },
+        } as const;
+        const newHistoryEntry = {
+          ...currentHistoryEntry,
+          items: [...currentHistoryEntry.items, newImage],
+        };
+        state.history.push(newHistoryEntry);
+      },
+    ),
     // -
     selectItem: addNewItemToHistory(
       (state, action: PayloadAction<string>, currentHistoryEntry) => {
@@ -332,4 +373,5 @@ export const {
   setBlockedItem,
   goBack,
   goForward,
+  setBackgroundImage,
 } = appSlice.actions;

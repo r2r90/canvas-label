@@ -34,7 +34,7 @@ export default function LayerItem({ item }: { item: StageItem }) {
       style={style}
       ref={setNodeRef}
       {...attributes}
-      className="flex items-center justify-between rounded-md border bg-yellow-50 p-2 text-black"
+      className="flex items-center justify-between rounded-md border  p-2 text-black"
     >
       <IconButton {...listeners}>
         <GripVertical size={18} />

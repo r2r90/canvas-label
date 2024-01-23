@@ -22,9 +22,6 @@ export default function TextInput() {
   };
   return (
     <Card className="p-3">
-      <CardHeader className="pt-2">
-        <CardTitle className="text-center">Text</CardTitle>
-      </CardHeader>
       <Textarea
         id="description"
         placeholder="Entrez votre text ..."

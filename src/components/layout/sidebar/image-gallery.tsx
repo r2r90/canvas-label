@@ -5,12 +5,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
 import * as process from "process";
 import { LuLayoutTemplate } from "react-icons/lu";
-import Image from "next/image";
-import { Input } from "@/components/ui/input";
 
 export const ImageGallery = () => {
   const [open, setOpen] = useState<boolean>(false);

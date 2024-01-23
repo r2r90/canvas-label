@@ -1,36 +1,28 @@
-import React, {
-  ChangeEvent,
-  type ElementRef,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { type ElementRef, useEffect, useRef, useState } from "react";
+import { Card } from "@/components/ui/card";
 import axios from "axios";
 import * as process from "process";
 import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import { addImage } from "@/store/app.slice";
-import { models } from "@/components/layout/sidebar/stage-settings/stage-size-selector/models";
-import { useAppDispatch } from "@/hooks";
+import { selectBackground, setBackgroundImage } from "@/store/app.slice";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { SliderPicker } from "react-color";
 
 type Props = {
   open: boolean;
 };
 
-export const ImageGallery = ({ open }: Props) => {
+export const StageBackgroundChange = ({ open }: Props) => {
   const dispatch = useAppDispatch();
-  const [query, setQuery] = useState<string>("");
+  const { stage } = useAppSelector((state) => state.app.history[0]);
+  const [query, setQuery] = useState<string>("gradient");
   const [page, setPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const [photos, setPhotos] = useState<any[]>([]);
-
   const scrollAreaRef = useRef<ElementRef<"div">>(null);
-
   const mainUrl = "https://api.unsplash.com/photos";
   const searchUrl = "https://api.unsplash.com/search/photos";
   const clientID = `?client_id=${process.env.NEXT_PUBLIC_ACCESS_KEY}`;
+  const bgColor = useAppSelector((state) => state.app.backgroundColor);
 
   useEffect(() => {
     fetchImages();
@@ -71,7 +63,7 @@ export const ImageGallery = ({ open }: Props) => {
     const ref = scrollAreaRef.current;
     const handler = () => {
       if (scrollAreaRef.current) {
-        /* console.log(
+        /*console.log(
           scrollAreaRef.current.clientHeight + scrollAreaRef.current.scrollTop,
           scrollAreaRef.current.scrollHeight - 2,
         );*/
@@ -89,50 +81,66 @@ export const ImageGallery = ({ open }: Props) => {
         return oldPage + 1;
       });
     };
-    const handleImageUploaded = () => {
-      if (!file) return;
-      const img = document.createElement("img");
-      const imageUrl = URL.createObjectURL(file);
-      img.onload = () => {
-        dispatch(addImage({ imageUrl, width: img.width, height: img.height }));
-        img.remove();
-      };
-      img.src = imageUrl;
-      img.style.cssText = "display: none;";
-      document.body.appendChild(img);
-    };
+
     scrollAreaRef.current?.addEventListener("scroll", handler);
     return () => ref?.removeEventListener("scroll", handler);
   }, [isLoading, open]);
 
-  const handleImageAdd = (url: string, width: number, height: number) => {
-    const aspectRatio = height / width;
-    const finalWidth = 200;
-    const finalHeight = finalWidth * aspectRatio;
+  const handleImageAdd = (url: string) => {
     dispatch(
-      addImage({ imageUrl: url, width: finalWidth, height: finalHeight }),
+      setBackgroundImage({
+        imageUrl: url,
+      }),
     );
+  };
+
+  const handleBackgroundSelect = (bgColor) => {
+    // dispatch(selectBackground(bgColor.hex));
+
+    console.log(bgColor);
   };
 
   return (
     <Card className="h-full min-h-[600px] p-3">
-      <Input
+      {/*<Input
         type="text"
         placeholder="Search Images"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
 
+
+*/}
+
+      <div className=" mt-4">
+        {/*  <input
+          className="h-[2rem] w-[2rem]"
+          type="color"
+          value={bgColor ?? undefined}
+          onChange={(e) => handleBackgroundSelect(e.target.value)}
+        />
+        <input
+          className="h-[2rem] w-[2rem]"
+          type="color"
+          value={bgColor ?? undefined}
+          onChange={(e) => handleBackgroundSelect(e.target.value)}
+        />*/}
+        <SliderPicker
+          color={bgColor}
+          onChangeComplete={(e) => handleBackgroundSelect(e)}
+        />
+      </div>
+
       <div
-        className="mt-3 grid max-h-[550px] w-full grid-cols-2 justify-center gap-2  overflow-auto "
+        className="grid max-h-[550px] w-full grid-cols-2 justify-center gap-2 overflow-auto "
         ref={scrollAreaRef}
       >
         {photos?.map((p, i) => {
           return (
             <div
               key={i}
-              onClick={() => handleImageAdd(p.urls.raw, p.width, p.height)}
-              className=" rounded-md  border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              onClick={() => handleImageAdd(p.urls.raw)}
+              className="rounded-md border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
             >
               <Image
                 key={p.i}

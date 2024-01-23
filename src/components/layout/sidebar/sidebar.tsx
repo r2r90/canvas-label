@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React, { useState } from "react";
 import { LuLayoutTemplate } from "react-icons/lu";
 import {
+  ColumnsIcon,
   GearIcon,
   ImageIcon,
   LayersIcon,
@@ -13,6 +14,7 @@ import {
 } from "@radix-ui/react-icons";
 import { StageSize } from "@/components/layout/sidebar/stage-settings/stage-size";
 import { StageBackground } from "@/components/layout/sidebar/stage-settings/stage-background";
+import { StageBackgroundChange } from "@/components/layout/sidebar/stage-settings/stage-background-change/stage-background-change";
 
 export function Sidebar() {
   const [openGallery, setOpenGallery] = useState<boolean>(false);
@@ -20,7 +22,7 @@ export function Sidebar() {
   return (
     <div className="items-left flex w-full flex-col p-2 pt-4">
       <Tabs>
-        <TabsList className="grid grid-cols-5">
+        <TabsList className="grid grid-cols-6">
           <TabsTrigger value="stage">
             <GearIcon />
           </TabsTrigger>
@@ -41,6 +43,9 @@ export function Sidebar() {
           <TabsTrigger value="layers">
             <LayersIcon />
           </TabsTrigger>
+          <TabsTrigger value="background">
+            <ColumnsIcon />
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="stage">
           <StageSize />
@@ -57,6 +62,9 @@ export function Sidebar() {
         </TabsContent>
         <TabsContent value="layers">
           <Layers />
+        </TabsContent>
+        <TabsContent value="background">
+          <StageBackgroundChange />
         </TabsContent>
       </Tabs>
     </div>
