@@ -1,6 +1,6 @@
 import React from "react";
 import { TbFlipHorizontal, TbFlipVertical } from "react-icons/tb";
-import { BsArrowsFullscreen } from "react-icons/Bs";
+import { BsArrowsFullscreen } from "react-icons/bs";
 import { Toggle } from "@/components/ui/toggle";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { type StageImageItem, updateImage } from "@/store/app.slice";
