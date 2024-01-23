@@ -42,7 +42,7 @@ export function ModelSelector({ models, types, ...props }: ModelSelectorProps) {
     <div className="grid gap-2">
       <HoverCard openDelay={200}>
         <HoverCardTrigger asChild>
-          <Label htmlFor="model">Selectionnez la taille d'etiquette</Label>
+          <Label htmlFor="model">{`Selectionnez la taille d'etiquette`}</Label>
         </HoverCardTrigger>
         <HoverCardContent
           align="start"
